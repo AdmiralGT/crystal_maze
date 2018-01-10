@@ -50,6 +50,7 @@ var radius = 10;
 var diameter = 2 * radius;
 var width = diameter * columns;
 var height = diameter * rows;
+var lit = "#ffffcc"
 
 function generate_grid()
 {
@@ -72,7 +73,7 @@ function generate_grid()
       circle.setAttributeNS(null, 'cx', centre_x);
       circle.setAttributeNS(null, 'cy', centre_y);
       circle.setAttributeNS(null, 'r', radius - 1);
-      circle.setAttributeNS(null, 'fill', 'red');
+      circle.setAttributeNS(null, 'fill', lit);
       circle.setAttributeNS(null, 'stroke', 'black');
       circle.setAttributeNS(null, 'stroke-width', 2);
 
