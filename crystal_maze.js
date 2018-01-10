@@ -51,9 +51,10 @@ var diameter = 2 * radius;
 var width = diameter * columns;
 var height = diameter * rows;
 
+var global_button_locations = new Array();
+
 function generate_grid()
 {
-
   var grid_svg = document.getElementById("lightboard_grid");
   grid_svg.setAttribute("width", width);
   grid_svg.setAttribute("height", height);
@@ -80,4 +81,29 @@ function generate_grid()
     }
   }
 }
+
+function generate_buttons()
+{
+	var button_svg = document.getElementById("button_grid");
+	
+}
+
+function generate_game()
+{
+	generate_grid();
+	generate_buttons();
+}
+
+function ButtonLocation(x, y)
+{
+	this.x = x;
+	this.y = y;
+}
+
+function shuffleButtons()
+{
+	var local_button_locations = global_button_locations.slice(0);
+	
+}
+
 
