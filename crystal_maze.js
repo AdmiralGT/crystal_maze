@@ -44,48 +44,52 @@ function test()
 }
 
 var svgNS = "http://www.w3.org/2000/svg";
-var rows = 15;
-var columns = 30;
-var radius = 10;
-var diameter = 2 * radius;
-var width = diameter * columns;
-var height = diameter * rows;
-var lit = "#ffffcc"
 
 var global_button_locations = new Array();
 
 function generate_grid()
 {
-  var grid_svg = document.getElementById("lightboard_grid");
-  grid_svg.setAttribute("width", width);
-  grid_svg.setAttribute("height", height);
-  for (row = 0; row < rows; row++)
-  {
-    for (column = 0; column < columns; column++)
-    {
-      var circle = document.createElementNS(svgNS, "circle");
-      var id = "circle_" + row + "_" + column;
-      var centre_x = (column * diameter) + radius;
-      var centre_y = (row * diameter) + radius;
-      var colour = "red";
-      var stroke = "black";
-      var stroke_width = "2";
-      circle.setAttributeNS(null, 'id', id);
-      circle.setAttributeNS(null, 'cx', centre_x);
-      circle.setAttributeNS(null, 'cy', centre_y);
-      circle.setAttributeNS(null, 'r', radius - 1);
-      circle.setAttributeNS(null, 'fill', lit);
-      circle.setAttributeNS(null, 'stroke', 'black');
-      circle.setAttributeNS(null, 'stroke-width', 2);
+	var rows = 15;
+	var columns = 30;
+	var radius = 10;
+	var diameter = 2 * radius;
+	var width = diameter * columns;
+	var height = diameter * rows;
+	var lit = "#ffffcc"
+	var grid_svg = document.getElementById("lightboard_grid");
+	grid_svg.setAttribute("width", width);
+	grid_svg.setAttribute("height", height);
+	for (row = 0; row < rows; row++)
+	{
+		for (column = 0; column < columns; column++)
+		{
+			var circle = document.createElementNS(svgNS, "circle");
+			var id = "circle_" + row + "_" + column;
+			var centre_x = (column * diameter) + radius;
+			var centre_y = (row * diameter) + radius;
+			var colour = "red";
+			var stroke = "black";
+			var stroke_width = "2";
+			circle.setAttributeNS(null, 'id', id);
+			circle.setAttributeNS(null, 'cx', centre_x);
+			circle.setAttributeNS(null, 'cy', centre_y);
+			circle.setAttributeNS(null, 'r', radius - 1);
+			circle.setAttributeNS(null, 'fill', lit);
+			circle.setAttributeNS(null, 'stroke', 'black');
+			circle.setAttributeNS(null, 'stroke-width', 2);
 
-      grid_svg.appendChild(circle);
-    }
-  }
+			grid_svg.appendChild(circle);
+		}
+	}
 }
 
 function generate_buttons()
 {
-	var button_svg = document.getElementById("button_grid");
+    var width = diameter * columns;
+    var height = diameter * rows;
+	var switch_svg = document.getElementById("switch_grid");
+	switch_svg.setAttribute("width", width);
+	switch_svg.setAttribute("height", height);
 	
 }
 
