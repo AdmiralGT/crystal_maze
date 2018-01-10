@@ -3,7 +3,7 @@ function test()
     $("#circle_1_1").attr("fill", "black");
 }
 
-var namespace = "http://www.w3.org/2000/svg";
+var svgNS = "http://www.w3.org/2000/svg";
 var rows = 5;
 var columns = 20;
 
@@ -22,13 +22,13 @@ function generate_grid()
       var colour = "red";
       var stroke = "black";
       var stroke_width = "2";
-      circle.setAttributeNS(namespace, 'id', id);
-      circle.setAttributeNS(namespace, 'cx', centre_x);
-      circle.setAttributeNS(namespace, 'cy', centre_y);
-      circle.setAttributeNS(namespace, 'r', radius);
-      circle.setAttributeNS(namespace, 'fill', colour);
-      circle.setAttributeNS(namespace, 'stroke', stroke);
-      circle.setAttributeNS(namespace, 'stroke-width', stroke_width);
+      circle.setAttributeNS(svgNS, 'id', id);
+      circle.setAttributeNS(svgNS, 'cx', centre_x);
+      circle.setAttributeNS(svgNS, 'cy', centre_y);
+      circle.setAttributeNS(svgNS, 'r', radius);
+      circle.setAttributeNS(svgNS, 'fill', colour);
+      circle.setAttributeNS(svgNS, 'stroke', stroke);
+      circle.setAttributeNS(svgNS, 'stroke-width', stroke_width);
 
       grid_svg.appendChild(circle);
     }
