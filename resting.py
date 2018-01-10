@@ -2,7 +2,7 @@ import cherrypy
 import os
 
 
-class Footy(object):
+class Crystal_Maze(object):
 
     def __init__(self):
         return
@@ -20,4 +20,4 @@ if __name__ == '__main__':
     cherrypy.config.update({'server.socket_host': '0.0.0.0'})
     cherrypy.config.update({'server.socket_port': 91})
 
-    cherrypy.quickstart(Footy(), '/', conf)
+    cherrypy.quickstart(Crystal_Maze(), '/', conf)

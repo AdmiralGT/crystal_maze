@@ -13,16 +13,15 @@
   <title>Table Tennis</title>
 </head>
 
-<body>
-<div class="lightboard">
-  <svg>
-    <circle id="circle_1_1" cx="50" cy="40" r="40" stroke="black" stroke-width="3"/>
+<body onload="generate_grid()">
+<div id="lightboard">
+  <svg id="lightboard_grid">
   </svg>
 </div>
 
-<div class="switches">
+<div id="switches">
   <svg>
-    <circle id="circle_button_1" onclick="test()" cx="50" cy="40" r="40" stroke="black" stroke-width="3" fill="yellow"/>
+	<circle id="circle_button_1" onclick="test()" cx="50" cy="40" r="37" stroke="black" stroke-width="3" fill="yellow"/>
   </svg>
 </div>
 
