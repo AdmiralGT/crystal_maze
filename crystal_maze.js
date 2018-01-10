@@ -21,19 +21,6 @@ var inactivy_list = [];
 var s_db;
 var d_db;
 
-//
-// function: startup
-//
-// params: none
-// returns: nothing
-//
-// entry function called on startup
-//
-function startup()
-{
-  // load the json data
-}
-
 function addClickHandlers()
 {
   //$('#add_single_left').on("click", function() {
@@ -43,6 +30,7 @@ function addClickHandlers()
     $("#circle_1_1").attr("fill", "red");
   });
 
+
   $("#add_single_right").click(function() {
 
   });
@@ -50,5 +38,10 @@ function addClickHandlers()
   $("#clear_results_players").click(function() {
     clear_results_inputs();
   });
+}
+
+function test()
+{
+    $("#circle_1_1").attr("fill", "red");
 }
 
