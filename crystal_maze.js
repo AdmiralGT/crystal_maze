@@ -96,20 +96,22 @@ function generate_buttons()
 	{
 		var button_location = new ButtonLocation(((2*radius) * button_id) + radius, radius);
 		global_button_locations.push(button_location);
-		var circle = document.createElementNS(svgNS, "circle");
+		var button = document.createElementNS(svgNS, "circle");
 		var id = "button_" + button_id;
 		var colour = "red";
 		var stroke = "block";
 		var stroke_width = 2;
 		var colours = ["red", "black", "yellow", "blue", "green", "orange"]
 		
-		circle.setAttributeNS(null, 'id', id);
-		circle.setAttributeNS(null, 'r', radius - 1);
-		circle.setAttributeNS(null, 'fill', colours[button_id]);
-		circle.setAttributeNS(null, 'stroke', stroke);
-		circle.setAttributeNS(null, 'stroke-width', stroke_width);
+		button.setAttributeNS(null, 'id', id);
+		button.setAttributeNS(null, 'r', radius - 1);
+		button.setAttributeNS(null, 'fill', colours[button_id]);
+		button.setAttributeNS(null, 'stroke', stroke);
+		button.setAttributeNS(null, 'stroke-width', stroke_width);
+		button.setAttributeNS(null, 'onclick', "test()");
+		
 
-		switch_svg.appendChild(circle);
+		switch_svg.appendChild(button);
 	}
 	
 	shuffleButtons();
