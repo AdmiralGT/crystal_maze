@@ -44,7 +44,7 @@ function test()
 }
 
 var svgNS = "http://www.w3.org/2000/svg";
-
+var buttons = 6;
 var global_button_locations = new Array();
 
 function generate_grid()
@@ -69,14 +69,14 @@ function generate_grid()
 			var centre_y = (row * diameter) + radius;
 			var colour = "red";
 			var stroke = "black";
-			var stroke_width = "2";
+			var stroke_width = 2;
 			circle.setAttributeNS(null, 'id', id);
 			circle.setAttributeNS(null, 'cx', centre_x);
 			circle.setAttributeNS(null, 'cy', centre_y);
 			circle.setAttributeNS(null, 'r', radius - 1);
 			circle.setAttributeNS(null, 'fill', lit);
-			circle.setAttributeNS(null, 'stroke', 'black');
-			circle.setAttributeNS(null, 'stroke-width', 2);
+			circle.setAttributeNS(null, 'stroke', stroke);
+			circle.setAttributeNS(null, 'stroke-width', stroke_width);
 
 			grid_svg.appendChild(circle);
 		}
@@ -85,11 +85,34 @@ function generate_grid()
 
 function generate_buttons()
 {
-    var width = diameter * columns;
-    var height = diameter * rows;
+    var width = 600;
+    var height = 300;
+	var radius = 40;
 	var switch_svg = document.getElementById("switch_grid");
 	switch_svg.setAttribute("width", width);
 	switch_svg.setAttribute("height", height);
+	
+	for (button_id = 0; button_id < buttons; button_id++)
+	{
+		var button_location = new ButtonLocation(((2*radius) * button_id) + radius, radius);
+		global_button_locations.push(button_location);
+		var circle = document.createElementNS(svgNS, "circle");
+		var id = "button_" + button_id;
+		var colour = "red";
+		var stroke = "block";
+		var stroke_width = 2;
+		var colours = ["red", "black", "yellow", "blue", "green", "orange"]
+		
+		circle.setAttributeNS(null, 'id', id);
+		circle.setAttributeNS(null, 'r', radius - 1);
+		circle.setAttributeNS(null, 'fill', colours[button_id]);
+		circle.setAttributeNS(null, 'stroke', stroke);
+		circle.setAttributeNS(null, 'stroke-width', stroke_width);
+
+		switch_svg.appendChild(circle);
+	}
+	
+	shuffleButtons();
 	
 }
 
@@ -105,10 +128,27 @@ function ButtonLocation(x, y)
 	this.y = y;
 }
 
+function getRandomInt(min, max)
+{
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+	
+
 function shuffleButtons()
 {
 	var local_button_locations = global_button_locations.slice(0);
-	
+	for (button_num = 0; button_num < buttons; button_num++)
+	{
+		var index = getRandomInt(0, local_button_locations.length - 1);
+		var button_id = "button_" + button_num;
+		var location = local_button_locations[index];
+		var button = document.getElementById(button_id);
+		button.setAttribute('cx', location.x);
+		button.setAttribute('cy', location.y);
+		
+		local_button_locations.splice(index, 1);
+		
+	}
 }
 
 
