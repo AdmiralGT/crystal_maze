@@ -41,13 +41,14 @@ function test()
 	$("#circle_9_14").attr('fill', 'black');
 	$("#circle_10_14").attr('fill', 'black');
 	
+	shuffleButtons();
 }
 
 var svgNS = "http://www.w3.org/2000/svg";
-var buttons = 6;
 var global_button_locations = new Array();
+var global_button_list = new Array();
 
-function generate_grid()
+function generate_switch_grid()
 {
 	var rows = 15;
 	var columns = 30;
@@ -83,47 +84,120 @@ function generate_grid()
 	}
 }
 
-function generate_buttons()
+function generate_button_grid()
 {
+	// All buttons have the same border for now...
+	var stroke = "block";
+	var stroke_width = 2;
+	
+	// Generate the general SVG area to put buttons in.
     var width = 600;
     var height = 300;
-	var radius = 40;
 	var switch_svg = document.getElementById("switch_grid");
 	switch_svg.setAttribute("width", width);
 	switch_svg.setAttribute("height", height);
 	
-	for (button_id = 0; button_id < buttons; button_id++)
+	// Generate a local copy of the global button list as we're going to remove elements from it
+	for (button_num = 0; button_num < global_button_list.length; button_num++)
+	{
+		// Get the Button Object from our global list and generate a element name for this Button.
+		var button = global_button_list[button_num];
+		var button_id = "button_" + button_num;
+		button.setButtonID(button_id);
+		
+		// Create a group attribute for the circle and text.
+		var g = document.createElementNS(svgNS, "g");
+		switch_svg.appendChild(g);
+		
+		// Create the button element with the properties from the Button.
+		var button_element = document.createElementNS(svgNS, "circle");
+		
+		button_element.setAttributeNS(null, 'id', button.button_id);
+		button_element.setAttributeNS(null, 'r', button.radius - 1);
+		button_element.setAttributeNS(null, 'fill', button.colour);
+		button_element.setAttributeNS(null, 'stroke', stroke);
+		button_element.setAttributeNS(null, 'stroke-width', stroke_width);
+		button_element.setAttributeNS(null, 'onclick', 'test()');
+		
+		// Put the Button element in the group.
+		g.appendChild(button_element);
+		
+		var text = document.createElementNS(svgNS, "text");
+		var text_id = "text_for_" + button_id;
+		button.setTextID(text_id);
+		text.setAttributeNS(null, 'id', text_id);
+		text.setAttributeNS(null, 'style', 'fill: ' + button.text_colour);
+		text.setAttributeNS(null, 'text-anchor', 'middle');
+		text.setAttributeNS(null, 'onclick', 'test()');
+		var text_node = document.createTextNode(button.text);
+		text.appendChild(text_node);
+		g.appendChild(text);
+
+	}
+	shuffleButtons();
+}
+
+// Function that generates all our necessary buttons
+function generate_buttons()
+{
+	var radius = 40;
+	var button = new Button("red", "RED", "black", false, radius);
+	global_button_list.push(button);
+	button = new Button("black", "BLACK", "white", true, radius);
+	global_button_list.push(button);
+	button = new Button("blue", "BLUE", "black", false, radius);
+	global_button_list.push(button);
+	button = new Button("orange", "ORANGE", "black", false, radius);
+	global_button_list.push(button);
+	button = new Button("yellow", "YELLOW", "black", false, radius);
+	global_button_list.push(button);
+	button = new Button("green", "GREEN", "black", false, radius);
+	global_button_list.push(button);
+	
+	for (button_id = 0; button_id < global_button_list.length; button_id++)
 	{
 		var button_location = new ButtonLocation(((2*radius) * button_id) + radius, radius);
 		global_button_locations.push(button_location);
-		var button = document.createElementNS(svgNS, "circle");
-		var id = "button_" + button_id;
-		var colour = "red";
-		var stroke = "block";
-		var stroke_width = 2;
-		var colours = ["red", "black", "yellow", "blue", "green", "orange"]
-		
-		button.setAttributeNS(null, 'id', id);
-		button.setAttributeNS(null, 'r', radius - 1);
-		button.setAttributeNS(null, 'fill', colours[button_id]);
-		button.setAttributeNS(null, 'stroke', stroke);
-		button.setAttributeNS(null, 'stroke-width', stroke_width);
-		button.setAttributeNS(null, 'onclick', "test()");
-		
-
-		switch_svg.appendChild(button);
 	}
-	
-	shuffleButtons();
-	
 }
 
+// Used on page load to generate the light grid and buttons that will be in game
 function generate_game()
 {
-	generate_grid();
+	generate_switch_grid();
 	generate_buttons();
+	generate_button_grid();
 }
 
+// Buttons that can be pressed by the user to turn off lights or reset the grid
+function Button(colour, text, text_colour, reset, radius)
+{
+	this.colour = colour;
+	this.text = text;
+	this.text_colour = text_colour;
+	this.reset = reset;
+	this.radius = radius;
+	this.location = null;
+	this.button_id = null;
+	this.text_id = null;
+	
+	this.setLocation = function(buttonLocation)
+	{
+		this.location = buttonLocation;
+	}
+	
+	this.setButtonID = function(buttonID)
+	{
+		this.button_id = buttonID;
+	}
+	
+	this.setTextID = function(textID)
+	{
+		this.text_id = textID;
+	}
+}
+
+// 
 function ButtonLocation(x, y)
 {
 	this.x = x;
@@ -139,18 +213,28 @@ function getRandomInt(min, max)
 function shuffleButtons()
 {
 	var local_button_locations = global_button_locations.slice(0);
-	for (button_num = 0; button_num < buttons; button_num++)
+	for (button_num = 0; button_num < global_button_list.length; button_num++)
 	{
 		var index = getRandomInt(0, local_button_locations.length - 1);
-		var button_id = "button_" + button_num;
+		var button = global_button_list[button_num];
 		var location = local_button_locations[index];
-		var button = document.getElementById(button_id);
-		button.setAttribute('cx', location.x);
-		button.setAttribute('cy', location.y);
+		button.setLocation(location);
+		redraw_button(button);
+		
 		
 		local_button_locations.splice(index, 1);
 		
 	}
+}
+
+function redraw_button(button)
+{
+	var button_element = document.getElementById(button.button_id);
+	button_element.setAttribute('cx', button.location.x);
+	button_element.setAttribute('cy', button.location.y);
+	var text_element = document.getElementById(button.text_id);
+	text_element.setAttribute('x', button.location.x);
+	text_element.setAttribute('y', button.location.y);
 }
 
 
