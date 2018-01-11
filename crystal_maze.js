@@ -21,7 +21,7 @@ function test()
 	$("#circle_11_4").attr('fill', 'black');
 	$("#circle_11_5").attr('fill', 'black');
 	$("#circle_11_6").attr('fill', 'black');
-	
+
 	$("#circle_3_11").attr('fill', 'black');
 	$("#circle_3_12").attr('fill', 'black');
 	$("#circle_3_13").attr('fill', 'black');
@@ -40,7 +40,11 @@ function test()
 	$("#circle_8_14").attr('fill', 'black');
 	$("#circle_9_14").attr('fill', 'black');
 	$("#circle_10_14").attr('fill', 'black');
-	
+
+    var e = window.event;
+
+    var button = getButtonFromElementID(this.event.target.id);
+
 	shuffleButtons();
 }
 
@@ -89,39 +93,39 @@ function generate_button_grid()
 	// All buttons have the same border for now...
 	var stroke = "block";
 	var stroke_width = 2;
-	
+
 	// Generate the general SVG area to put buttons in.
     var width = 600;
     var height = 300;
 	var switch_svg = document.getElementById("switch_grid");
 	switch_svg.setAttribute("width", width);
 	switch_svg.setAttribute("height", height);
-	
+
 	// Generate a local copy of the global button list as we're going to remove elements from it
 	for (button_num = 0; button_num < global_button_list.length; button_num++)
 	{
 		// Get the Button Object from our global list and generate a element name for this Button.
 		var button = global_button_list[button_num];
-		var button_id = "button_" + button_num;
+		var button_id = "button_" + button_num.toString().padStart(2, "0");
 		button.setButtonID(button_id);
-		
+
 		// Create a group attribute for the circle and text.
 		var g = document.createElementNS(svgNS, "g");
 		switch_svg.appendChild(g);
-		
+
 		// Create the button element with the properties from the Button.
 		var button_element = document.createElementNS(svgNS, "circle");
-		
+
 		button_element.setAttributeNS(null, 'id', button.button_id);
 		button_element.setAttributeNS(null, 'r', button.radius - 1);
 		button_element.setAttributeNS(null, 'fill', button.colour);
 		button_element.setAttributeNS(null, 'stroke', stroke);
 		button_element.setAttributeNS(null, 'stroke-width', stroke_width);
 		button_element.setAttributeNS(null, 'onclick', 'test()');
-		
+
 		// Put the Button element in the group.
 		g.appendChild(button_element);
-		
+
 		var text = document.createElementNS(svgNS, "text");
 		var text_id = "text_for_" + button_id;
 		button.setTextID(text_id);
@@ -153,7 +157,7 @@ function generate_buttons()
 	global_button_list.push(button);
 	button = new Button("green", "GREEN", "black", false, radius);
 	global_button_list.push(button);
-	
+
 	for (button_id = 0; button_id < global_button_list.length; button_id++)
 	{
 		var button_location = new ButtonLocation(((2*radius) * button_id) + radius, radius);
@@ -180,24 +184,24 @@ function Button(colour, text, text_colour, reset, radius)
 	this.location = null;
 	this.button_id = null;
 	this.text_id = null;
-	
+
 	this.setLocation = function(buttonLocation)
 	{
 		this.location = buttonLocation;
 	}
-	
+
 	this.setButtonID = function(buttonID)
 	{
 		this.button_id = buttonID;
 	}
-	
+
 	this.setTextID = function(textID)
 	{
 		this.text_id = textID;
 	}
 }
 
-// 
+//
 function ButtonLocation(x, y)
 {
 	this.x = x;
@@ -208,7 +212,7 @@ function getRandomInt(min, max)
 {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-	
+
 
 function shuffleButtons()
 {
@@ -220,10 +224,10 @@ function shuffleButtons()
 		var location = local_button_locations[index];
 		button.setLocation(location);
 		redraw_button(button);
-		
-		
+
+
 		local_button_locations.splice(index, 1);
-		
+
 	}
 }
 
@@ -237,4 +241,16 @@ function redraw_button(button)
 	text_element.setAttribute('y', button.location.y);
 }
 
+function getButtonFromElementID(elementID)
+{
+    // Either the text or button was pressed, the last 8 characters is always
+    // the button's buttonID.
+    var button_num_string = this.event.target.id.substr(this.event.target.id.length - 2);
+    var button_num = parseInt(button_num_string, 10);
+    var button = global_button_list[button_num];
 
+    this.alert("Pressed " + button.text);
+
+
+    return button;
+}
