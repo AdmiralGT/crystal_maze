@@ -2,17 +2,25 @@ var svgNS = "http://www.w3.org/2000/svg";
 var global_button_locations = new Array();
 var global_button_list = new Array();
 var lit = "#ffffcc"
+var switchboard_rows = 15;
+var switchboard_columns = 30;
+var button_grid_width = 4;
 
-function change_lights(on)
+function turn_all_lights_on()
 {
-	if (on)
+	for (row = 0; row < switchboard_rows; row++)
 	{
-		colour = lit;
+		for (column = 0; column < switchboard_columns; column++)
+		{
+			var element_name = "#circle_" + row + "_" + column;
+			$(element_name).attr('fill', lit);
+		}
 	}
-	else
-	{
-		colour = 'black';
-	}
+}
+
+function change_lights()
+{
+	colour = 'black';
 
 	$("#circle_3_4").attr('fill', colour);
 	$("#circle_3_5").attr('fill', colour);
@@ -62,30 +70,28 @@ function test()
 
     if (button.reset)
     {
-    	change_lights(true);
+    	turn_all_lights_on();
 	   	shuffleButtons();
     }
     else
     {
-    	change_lights(false);
+    	change_lights();
     }
 
 }
 
 function generate_switch_grid()
 {
-	var rows = 15;
-	var columns = 30;
 	var radius = 10;
 	var diameter = 2 * radius;
-	var width = diameter * columns;
-	var height = diameter * rows;
+	var width = diameter * switchboard_columns;
+	var height = diameter * switchboard_rows;
 	var grid_svg = document.getElementById("lightboard_grid");
 	grid_svg.setAttribute("width", width);
 	grid_svg.setAttribute("height", height);
-	for (row = 0; row < rows; row++)
+	for (row = 0; row < switchboard_rows; row++)
 	{
-		for (column = 0; column < columns; column++)
+		for (column = 0; column < switchboard_columns; column++)
 		{
 			var circle = document.createElementNS(svgNS, "circle");
 			var id = "circle_" + row + "_" + column;
@@ -177,9 +183,9 @@ function generate_buttons()
 	button = new Button("green", "GREEN", "black", false, radius);
 	global_button_list.push(button);
 
-	for (button_id = 0; button_id < global_button_list.length; button_id++)
+	for (button_num = 0; button_num < global_button_list.length; button_num++)
 	{
-		var button_location = new ButtonLocation(((2*radius) * button_id) + radius, radius);
+		var button_location = new ButtonLocation(((2*radius) * (button_num % button_grid_width)) + radius, (2*radius*Math.floor(button_num/button_grid_width)) + radius);
 		global_button_locations.push(button_location);
 	}
 }
