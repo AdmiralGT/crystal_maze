@@ -13,6 +13,7 @@ var button_radius = 40;
 var button_diameter = 2 * button_radius;
 var button_grid_width = Math.floor(switchboard_width / (button_diameter));
 var segment_size = 5;
+var total_segments = 0;
 
 function turn_all_lights_on()
 {
@@ -69,7 +70,7 @@ function transform_to_segment(segment, digit_transform)
     var segment_offset = segment_size + 1;
 	if (segment == 'a')
 	{
-		for (ii = 0; ii < segment_size; ii++)
+		for (var ii = 0; ii < segment_size; ii++)
 		{
 			transforms.push(new Transform(digit_transform.x + ii + 1,
 			                              digit_transform.y));
@@ -77,7 +78,7 @@ function transform_to_segment(segment, digit_transform)
 	}
 	else if (segment == 'b')
 	{
-		for (ii = 0; ii < segment_size; ii++)
+		for (var ii = 0; ii < segment_size; ii++)
 		{
 			transforms.push(new Transform(digit_transform.x + segment_offset,
 			                              digit_transform.y + ii + 1));
@@ -85,7 +86,7 @@ function transform_to_segment(segment, digit_transform)
 	}
 	else if (segment == 'c')
 	{
-		for (ii = 0; ii < segment_size; ii++)
+		for (var ii = 0; ii < segment_size; ii++)
 		{
 			transforms.push(new Transform(digit_transform.x + segment_offset,
 			                              digit_transform.y + ii + segment_offset + 1));
@@ -93,7 +94,7 @@ function transform_to_segment(segment, digit_transform)
 	}
 	else if (segment == 'd')
 	{
-		for (ii = 0; ii < segment_size; ii++)
+		for (var ii = 0; ii < segment_size; ii++)
 		{
 			transforms.push(new Transform(digit_transform.x + ii + 1,
 			                              digit_transform.y + (2 * segment_offset)));
@@ -101,7 +102,7 @@ function transform_to_segment(segment, digit_transform)
 	}
 	else if (segment == 'e')
 	{
-		for (ii = 0; ii < segment_size; ii++)
+		for (var ii = 0; ii < segment_size; ii++)
 		{
 			transforms.push(new Transform(digit_transform.x,
 			                              digit_transform.y + ii + segment_offset + 1));
@@ -109,7 +110,7 @@ function transform_to_segment(segment, digit_transform)
 	}
 	else if (segment == 'f')
 	{
-		for (ii = 0; ii < segment_size; ii++)
+		for (var ii = 0; ii < segment_size; ii++)
 		{
 			transforms.push(new Transform(digit_transform.x,
 			                              digit_transform.y + ii + 1));
@@ -117,7 +118,7 @@ function transform_to_segment(segment, digit_transform)
 	}
 	else if (segment == 'g')
 	{
-		for (ii = 0; ii < segment_size; ii++)
+		for (var ii = 0; ii < segment_size; ii++)
 		{
 			transforms.push(new Transform(digit_transform.x + ii + 1,
 			                              digit_transform.y + segment_offset));
@@ -204,9 +205,9 @@ function generate_switch_grid()
 	var grid_svg = document.getElementById("lightboard_grid");
 	grid_svg.setAttribute("width", switchboard_width);
 	grid_svg.setAttribute("height", switchboard_height);
-	for (row = 0; row < switchboard_rows; row++)
+	for (var row = 0; row < switchboard_rows; row++)
 	{
-		for (column = 0; column < switchboard_columns; column++)
+		for (var column = 0; column < switchboard_columns; column++)
 		{
 			var circle = document.createElementNS(svgNS, "circle");
 			var id = "circle_" + column + "_" + row;
@@ -243,7 +244,7 @@ function generate_button_grid()
 	switch_svg.setAttribute("height", height);
 
 	// Generate a local copy of the global button list as we're going to remove elements from it
-	for (button_num = 0; button_num < global_button_list.length; button_num++)
+	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
 		// Get the Button Object from our global list and generate a element name for this Button.
 		var button = global_button_list[button_num];
@@ -305,7 +306,7 @@ function generate_buttons()
 	make_button("yellow", "YELLOW", "black", false);
 	make_button("green", "GREEN", "black", false);
 
-	for (button_num = 0; button_num < global_button_list.length; button_num++)
+	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
 		var button_location = new ButtonLocation((button_diameter * (button_num % button_grid_width)) + button_radius, 
                                                  (button_diameter*Math.floor(button_num/button_grid_width)) + button_radius);
@@ -316,12 +317,14 @@ function generate_buttons()
 // Function to generate the digits to determine which lights to turn off
 function generate_digits(digit_string)
 {
-	for (ii = 0; ii < digit_string.length; ii++)
+	for (var ii = 0; ii < digit_string.length; ii++)
 	{
 		var digit = create_digit(digit_string.charAt(ii));
 		digit.setPosition(ii);
+        total_segments += digit.desired_segments;
 		global_digit_list.push(digit);
 	}
+    alert(total_segments);
 }
 
 // Function to create a Digit object for a string
@@ -419,6 +422,7 @@ function ButtonLocation(x, y)
 	this.y = y;
 }
 
+// A segment of lights that make up a digit
 function Segment(seg, desired)
 {
 	this.name = seg;
@@ -438,6 +442,14 @@ function Digit(a, b, c, d, e, f, g, h)
 	this.segments.push(new Segment('f', f));
 	this.segments.push(new Segment('g', g));
 	this.pos = 0;
+    this.desired_segments = 0;
+    for (var ii = 0; ii < this.segments.length; ii++)
+    {
+        if (this.segments[ii].desired)
+        {
+            this.desired_segments++;
+        }
+    }
 
 	this.setPosition = function(pos)
 	{
@@ -455,7 +467,7 @@ function getRandomInt(min, max)
 function shuffleButtons()
 {
 	var local_button_locations = global_button_locations.slice(0);
-	for (button_num = 0; button_num < global_button_list.length; button_num++)
+	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
 		// Choose a random button and update it's location.
 		var index = getRandomInt(0, local_button_locations.length - 1);
