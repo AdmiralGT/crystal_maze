@@ -1,6 +1,7 @@
 var svgNS = "http://www.w3.org/2000/svg";
 var global_button_locations = new Array();
 var global_button_list = new Array();
+var global_digit_list = new Array();
 var lit = "#ffffcc"
 var switchboard_rows = 15;
 var switchboard_columns = 30;
@@ -12,58 +13,161 @@ function turn_all_lights_on()
 	{
 		for (column = 0; column < switchboard_columns; column++)
 		{
-			var element_name = "#circle_" + row + "_" + column;
+			var element_name = "#circle_" + column + "_" + row;
 			$(element_name).attr('fill', lit);
 		}
 	}
 }
 
+// Turn off some lights
 function change_lights()
+{
+	for (digit_num = 0; digit_num < global_digit_list.length; digit_num++)
+	{
+		var digit = global_digit_list[digit_num];
+		var digit_transform = transform_to_digit(digit_num);
+
+		for (segment_num = 0; segment_num < digit.segments.length; segment_num++)
+		{
+			var segment = digit.segments[segment_num];
+			if (segment.desired)
+			{
+				var transforms = transform_to_segment(segment.name, digit_transform);
+
+				for (transform_num = 0; transform_num < transforms.length; transform_num++)
+				{
+					var transform = transforms[transform_num];
+					var name = "#circle_" + transform.x + "_" + transform.y;
+					$(name).attr('fill', 'black');
+				}
+			}
+		}
+	}
+}
+
+//
+function transform_to_digit(digit)
+{
+	return new Transform((7*digit) + 2, 3);
+}
+
+function transform_to_segment(segment, digit_transform)
+{
+	var transforms = new Array();
+	if (segment == 'a')
+	{
+		for (ii = 0; ii < 3; ii++)
+		{
+			transforms.push(new Transform(digit_transform.x + ii + 1,
+			                              digit_transform.y));
+		}
+	}
+	else if (segment == 'b')
+	{
+		for (ii = 0; ii < 3; ii++)
+		{
+			transforms.push(new Transform(digit_transform.x + 4,
+			                              digit_transform.y + ii + 1));
+		}
+	}
+	else if (segment == 'c')
+	{
+		for (ii = 0; ii < 3; ii++)
+		{
+			transforms.push(new Transform(digit_transform.x + 4,
+			                              digit_transform.y + ii + 5));
+		}
+	}
+	else if (segment == 'd')
+	{
+		for (ii = 0; ii < 3; ii++)
+		{
+			transforms.push(new Transform(digit_transform.x + ii + 1,
+			                              digit_transform.y + 8));
+		}
+	}
+	else if (segment == 'e')
+	{
+		for (ii = 0; ii < 3; ii++)
+		{
+			transforms.push(new Transform(digit_transform.x,
+			                              digit_transform.y + ii + 5));
+		}
+	}
+	else if (segment == 'f')
+	{
+		for (ii = 0; ii < 3; ii++)
+		{
+			transforms.push(new Transform(digit_transform.x,
+			                              digit_transform.y + ii + 1));
+		}
+	}
+	else if (segment == 'g')
+	{
+		for (ii = 0; ii < 3; ii++)
+		{
+			transforms.push(new Transform(digit_transform.x + ii + 1,
+			                              digit_transform.y + 4));
+		}
+	}
+	return transforms;
+}
+
+// How to transform position from the top left of the switch board
+function Transform(x, y)
+{
+	this.x = x;
+	this.y = y;
+}
+
+// Just a function that turns some lights off for testing.
+function change_lights_test()
 {
 	colour = 'black';
 
-	$("#circle_3_4").attr('fill', colour);
-	$("#circle_3_5").attr('fill', colour);
-	$("#circle_3_6").attr('fill', colour);
 	$("#circle_4_3").attr('fill', colour);
 	$("#circle_5_3").attr('fill', colour);
 	$("#circle_6_3").attr('fill', colour);
-	$("#circle_4_7").attr('fill', colour);
-	$("#circle_5_7").attr('fill', colour);
-	$("#circle_6_7").attr('fill', colour);
+	$("#circle_3_4").attr('fill', colour);
+	$("#circle_3_5").attr('fill', colour);
+	$("#circle_3_6").attr('fill', colour);
 	$("#circle_7_4").attr('fill', colour);
 	$("#circle_7_5").attr('fill', colour);
 	$("#circle_7_6").attr('fill', colour);
-	$("#circle_8_3").attr('fill', colour);
-	$("#circle_9_3").attr('fill', colour);
-	$("#circle_10_3").attr('fill', colour);
-	$("#circle_8_7").attr('fill', colour);
-	$("#circle_9_7").attr('fill', colour);
-	$("#circle_10_7").attr('fill', colour);
-	$("#circle_11_4").attr('fill', colour);
-	$("#circle_11_5").attr('fill', colour);
-	$("#circle_11_6").attr('fill', colour);
+	$("#circle_4_7").attr('fill', colour);
+	$("#circle_5_7").attr('fill', colour);
+	$("#circle_6_7").attr('fill', colour);
+	$("#circle_3_8").attr('fill', colour);
+	$("#circle_3_9").attr('fill', colour);
+	$("#circle_3_10").attr('fill', colour);
+	$("#circle_7_8").attr('fill', colour);
+	$("#circle_7_9").attr('fill', colour);
+	$("#circle_7_10").attr('fill', colour);
+	$("#circle_4_11").attr('fill', colour);
+	$("#circle_5_11").attr('fill', colour);
+	$("#circle_6_11").attr('fill', colour);
 
-	$("#circle_3_11").attr('fill', colour);
-	$("#circle_3_12").attr('fill', colour);
-	$("#circle_3_13").attr('fill', colour);
+	$("#circle_11_3").attr('fill', colour);
+	$("#circle_12_3").attr('fill', colour);
+	$("#circle_13_3").attr('fill', colour);
 	$("#circle_11_11").attr('fill', colour);
-	$("#circle_11_12").attr('fill', colour);
-	$("#circle_11_13").attr('fill', colour);
-	$("#circle_4_10").attr('fill', colour);
-	$("#circle_5_10").attr('fill', colour);
-	$("#circle_6_10").attr('fill', colour);
-	$("#circle_4_14").attr('fill', colour);
-	$("#circle_5_14").attr('fill', colour);
-	$("#circle_6_14").attr('fill', colour);
-	$("#circle_8_10").attr('fill', colour);
-	$("#circle_9_10").attr('fill', colour);
+	$("#circle_12_11").attr('fill', colour);
+	$("#circle_13_11").attr('fill', colour);
+	$("#circle_10_4").attr('fill', colour);
+	$("#circle_10_5").attr('fill', colour);
+	$("#circle_10_6").attr('fill', colour);
+	$("#circle_14_4").attr('fill', colour);
+	$("#circle_14_5").attr('fill', colour);
+	$("#circle_14_6").attr('fill', colour);
+	$("#circle_10_8").attr('fill', colour);
+	$("#circle_10_9").attr('fill', colour);
 	$("#circle_10_10").attr('fill', colour);
-	$("#circle_8_14").attr('fill', colour);
-	$("#circle_9_14").attr('fill', colour);
-	$("#circle_10_14").attr('fill', colour);
+	$("#circle_14_8").attr('fill', colour);
+	$("#circle_14_9").attr('fill', colour);
+	$("#circle_14_10").attr('fill', colour);
 }
 
+// Function called when a button is pressed
 function test()
 {
     var button = getButtonFromElementID(this.event.target.id);
@@ -76,10 +180,12 @@ function test()
     else
     {
     	change_lights();
+    	//change_lights_test();
     }
 
 }
 
+// Generate the grid of lightbulbs that will be turned off to reveal the code.
 function generate_switch_grid()
 {
 	var radius = 10;
@@ -94,7 +200,7 @@ function generate_switch_grid()
 		for (column = 0; column < switchboard_columns; column++)
 		{
 			var circle = document.createElementNS(svgNS, "circle");
-			var id = "circle_" + row + "_" + column;
+			var id = "circle_" + column + "_" + row;
 			var centre_x = (column * diameter) + radius;
 			var centre_y = (row * diameter) + radius;
 			var colour = "red";
@@ -113,6 +219,8 @@ function generate_switch_grid()
 	}
 }
 
+// Generate the grid of buttons that can be pressed to turn off lights or reset
+// the light board.
 function generate_button_grid()
 {
 	// All buttons have the same border for now...
@@ -190,6 +298,68 @@ function generate_buttons()
 	}
 }
 
+// Function to generate the digits to determine which lights to turn off
+function generate_digits(digit_string)
+{
+	for (ii = 0; ii < digit_string.length; ii++)
+	{
+		var digit = create_digit(digit_string.charAt(ii));
+		digit.setPosition(ii);
+		global_digit_list.push(digit);
+	}
+}
+
+// Function to create a Digit object for a string
+// Note: This is a terrible function, but I can't yet think of a better way
+//       and it does what I want.
+function create_digit(digit)
+{
+	if (digit == '0')
+	{
+		return new Digit(true, true, true, true, true, true, false);
+	}
+	else if (digit == '1')
+	{
+		return new Digit(false, true, true, false, false, false, false);
+	}
+	else if (digit == '2')
+	{
+		return new Digit(true, true, false, true, true, false, true);
+	}
+	else if (digit == '3')
+	{
+		return new Digit(true, true, true, true, false, false, true);
+	}
+	else if (digit == '4')
+	{
+		return new Digit(false, true, true, false, false, true, true);
+	}
+	else if (digit == '5')
+	{
+		return new Digit(true, false, true, true, false, true, true);
+	}
+	else if (digit == '6')
+	{
+		return new Digit(true, false, true, true, true, true, true);
+	}
+	else if (digit == '7')
+	{
+		return new Digit(true, true, true, false, false, false, false);
+	}
+	else if (digit == '8')
+	{
+		return new Digit(true, true, true, true, true, true, true);
+	}
+	else if (digit == '9')
+	{
+		return new Digit(true, true, true, true, false, true, true);
+	}
+	else
+	{
+		alert('Bad digit ' + digit);
+	}
+}
+
 // Used on page load to generate the light grid and buttons that will be in game
 function generate_game()
 {
@@ -227,36 +397,64 @@ function Button(colour, text, text_colour, reset, radius)
 	}
 }
 
-//
+// Class representing the location in the button grid where a button is drawn
 function ButtonLocation(x, y)
 {
 	this.x = x;
 	this.y = y;
 }
 
+function Segment(seg, desired)
+{
+	this.name = seg;
+	this.desired = desired;
+	this.current = false;
+}
+
+// Class representing the segments that requiring turning off for a digit
+function Digit(a, b, c, d, e, f, g, h)
+{
+	this.segments = new Array();
+	this.segments.push(new Segment('a', a));
+	this.segments.push(new Segment('b', b));
+	this.segments.push(new Segment('c', c));
+	this.segments.push(new Segment('d', d));
+	this.segments.push(new Segment('e', e));
+	this.segments.push(new Segment('f', f));
+	this.segments.push(new Segment('g', g));
+	this.pos = 0;
+
+	this.setPosition = function(pos)
+	{
+		this.position = pos;
+	}
+}
+
+// Get a random int between a minimum and maximum value (inclusive).
 function getRandomInt(min, max)
 {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-
+// Shuffle the order of buttons around on the display.
 function shuffleButtons()
 {
 	var local_button_locations = global_button_locations.slice(0);
 	for (button_num = 0; button_num < global_button_list.length; button_num++)
 	{
+		// Choose a random button and update it's location.
 		var index = getRandomInt(0, local_button_locations.length - 1);
 		var button = global_button_list[button_num];
 		var location = local_button_locations[index];
 		button.setLocation(location);
 		redraw_button(button);
 
-
+		// Remove this button for the list of buttons to shuffle.
 		local_button_locations.splice(index, 1);
-
 	}
 }
 
+// Redraw a button in it's new position
 function redraw_button(button)
 {
 	var button_element = document.getElementById(button.button_id);
@@ -267,6 +465,7 @@ function redraw_button(button)
 	text_element.setAttribute('y', button.location.y);
 }
 
+// Get a Button Object from a HTTP Element ID
 function getButtonFromElementID(elementID)
 {
     // Either the text or button was pressed, the last 8 characters is always
@@ -278,15 +477,16 @@ function getButtonFromElementID(elementID)
     return button;
 }
 
+// Makes a request to the server to get the code.
 function loadjsondata(url)
 {
     // first load the Ajax; load the pics file @@jquery this?
-    var bob = new XMLHttpRequest();
-    bob.open("GET", 'answer', true);
-    bob.onload = function (e) {
-        var journaljson = eval('(' + bob.responseText + ')');
-        var journal = journaljson.data;
-        alert(journal);
+    var digit_request = new XMLHttpRequest();
+    digit_request.open("GET", 'answer', true);
+    digit_request.onload = function (e) {
+        var json = eval('(' + digit_request.responseText + ')');
+        var digits = json.data;
+        generate_digits(digits.toString());
     };
-    bob.send();
+    digit_request.send();
 }
