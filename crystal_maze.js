@@ -196,6 +196,7 @@ function generate_game()
 	generate_switch_grid();
 	generate_buttons();
 	generate_button_grid();
+	loadjsondata('answer');
 }
 
 // Buttons that can be pressed by the user to turn off lights or reset the grid
@@ -275,4 +276,17 @@ function getButtonFromElementID(elementID)
     var button = global_button_list[button_num];
 
     return button;
+}
+
+function loadjsondata(url)
+{
+    // first load the Ajax; load the pics file @@jquery this?
+    var bob = new XMLHttpRequest();
+    bob.open("GET", 'answer', true);
+    bob.onload = function (e) {
+        var journaljson = eval('(' + bob.responseText + ')');
+        var journal = journaljson.data;
+        alert(journal);
+    };
+    bob.send();
 }
