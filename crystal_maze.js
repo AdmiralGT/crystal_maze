@@ -160,6 +160,16 @@ function transform_to_segment(segment, digit_transform)
 	return transforms;
 }
 
+function reset_game()
+{
+    // Reset the list of active segments on each digit
+    for (var ii = 0; ii < global_digit_list.length; ii++)
+    {
+        global_digit_list[ii].active_segments = 0;
+    }
+    total_segments_on = 0;
+}
+
 // Function called when a button is pressed
 function test()
 {
@@ -168,14 +178,18 @@ function test()
     if (button.reset)
     {
     	turn_all_lights_on();
+        reset_game();
 	   	shuffleButtons();
     }
     else
     {
-        var segment = determine_next_segment(total_segments_on);
-    	turn_off_segment(segment);
-        total_segments_on++;
-        global_digit_list[segment.digit_pos].active_segments++;
+        if (total_segments_on < total_segments)
+        {
+            var segment = determine_next_segment(total_segments_on);
+            turn_off_segment(segment);
+            total_segments_on++;
+            global_digit_list[segment.digit_pos].active_segments++;
+        }
     }
 
 }
