@@ -1,6 +1,8 @@
 var svgNS = "http://www.w3.org/2000/svg";
-var global_button_locations = new Array();
+
+// Do not change the order of global_button_list
 var global_button_list = new Array();
+var global_button_locations = new Array();
 var global_digit_list = new Array();
 var digit_segment_list = new Array();
 var lit = "#ffffcc"
@@ -56,33 +58,6 @@ function turn_off_segment(segment)
         var name = "#circle_" + transform.x + "_" + transform.y;
         $(name).attr('fill', 'black');
     }
-}
-
-
-// Turn off some lights
-function change_lights()
-{
-	for (digit_num = 0; digit_num < global_digit_list.length; digit_num++)
-	{
-		var digit = global_digit_list[digit_num];
-		var digit_transform = transform_to_digit(digit_num);
-
-		for (segment_num = 0; segment_num < digit.segments.length; segment_num++)
-		{
-			var segment = digit.segments[segment_num];
-			if (segment.desired)
-			{
-				var transforms = transform_to_segment(segment.name, digit_transform);
-
-				for (transform_num = 0; transform_num < transforms.length; transform_num++)
-				{
-					var transform = transforms[transform_num];
-					var name = "#circle_" + transform.x + "_" + transform.y;
-					$(name).attr('fill', 'black');
-				}
-			}
-		}
-	}
 }
 
 // Finds the position of the top left of a digit
@@ -160,6 +135,7 @@ function transform_to_segment(segment, digit_transform)
 	return transforms;
 }
 
+// Reset the game state
 function reset_game()
 {
     // Reset the list of active segments on each digit
@@ -168,6 +144,38 @@ function reset_game()
         global_digit_list[ii].active_segments = 0;
     }
     total_segments_on = 0;
+}
+
+// Determine which buttons are going to be reset buttons
+function create_reset_buttons()
+{
+    var reset_array = new Array();
+    
+    // Each segment needs a valid button to press
+    for (var ii = 0; ii < total_segments; ii++)
+    {
+        reset_array.push(false);
+    }
+    
+    // Remaining segments are all reset buttons
+    for (var ii = 0; ii < global_button_list.length - total_segments; ii++)
+    {
+        reset_array.push(true);
+    }
+    
+    // Shuffle the array to randomise and then assign to buttons
+    shuffle(reset_array);
+    for (var ii = 0; ii < reset_array.length; ii++)
+    {
+        global_button_list[ii].setReset(reset_array[ii]);
+    }
+}
+
+// Complete game setup, generate the digits and create reset buttons
+function finish_game_setup(digits)
+{
+    generate_digits(digits);
+    create_reset_buttons();
 }
 
 // Function called when a button is pressed
@@ -280,45 +288,45 @@ function generate_button_grid()
 }
 
 // Function to build a button and put it in the global list of buttons.
-function make_button(colour, text, text_colour, reset)
+function make_button(colour, text, text_colour)
 {
-    var button = new Button(colour, text, text_colour, reset, button_radius);
+    var button = new Button(colour, text, text_colour, button_radius);
     global_button_list.push(button);
 }
 
 // Function that generates all our necessary buttons
 function generate_buttons()
 {
-	make_button("red", "RED", "black", false);
-	make_button("black", "BLACK", "white", true);
-	make_button("blue", "BLUE", "black", false);
-	make_button("orange", "ORANGE", "black", false);
-	make_button("yellow", "YELLOW", "black", false);
-	make_button("green", "GREEN", "black", false);
-	make_button("red", "RED", "black", false);
-	make_button("black", "BLACK", "white", true);
-	make_button("blue", "BLUE", "black", false);
-	make_button("orange", "ORANGE", "black", false);
-	make_button("yellow", "YELLOW", "black", false);
-	make_button("green", "GREEN", "black", false);
-	make_button("red", "RED", "black", false);
-	make_button("black", "BLACK", "white", true);
-	make_button("blue", "BLUE", "black", false);
-	make_button("orange", "ORANGE", "black", false);
-	make_button("yellow", "YELLOW", "black", false);
-	make_button("green", "GREEN", "black", false);
-	make_button("red", "RED", "black", false);
-	make_button("black", "BLACK", "white", true);
-	make_button("blue", "BLUE", "black", false);
-	make_button("orange", "ORANGE", "black", false);
-	make_button("yellow", "YELLOW", "black", false);
-	make_button("green", "GREEN", "black", false);
-	make_button("red", "RED", "black", false);
-	make_button("black", "BLACK", "white", true);
-	make_button("blue", "BLUE", "black", false);
-	make_button("orange", "ORANGE", "black", false);
-	make_button("yellow", "YELLOW", "black", false);
-	make_button("green", "GREEN", "black", false);
+	make_button("red", "1", "black");
+	make_button("black", "2", "white");
+	make_button("blue", "3", "black");
+	make_button("orange", "4", "black");
+	make_button("yellow", "5", "black");
+	make_button("green", "6", "black");
+	make_button("red", "7", "black");
+	make_button("black", "8", "white");
+	make_button("blue", "9", "black");
+	make_button("orange", "10", "black");
+	make_button("yellow", "11", "black");
+	make_button("green", "12", "black");
+	make_button("red", "13", "black");
+	make_button("black", "14", "white");
+	make_button("blue", "15", "black");
+	make_button("orange", "16", "black");
+	make_button("yellow", "17", "black");
+	make_button("green", "18", "black");
+	make_button("red", "19", "black");
+	make_button("black", "20", "white");
+	make_button("blue", "21", "black");
+	make_button("orange", "22", "black");
+	make_button("yellow", "23", "black");
+	make_button("green", "24", "black");
+	make_button("red", "25", "black");
+	make_button("black", "26", "white");
+	make_button("blue", "27", "black");
+	make_button("orange", "28", "black");
+	make_button("yellow", "29", "black");
+	make_button("green", "30", "black");
 
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
@@ -465,7 +473,7 @@ function loadjsondata(url)
     digit_request.onload = function (e) {
         var json = eval('(' + digit_request.responseText + ')');
         var digits = json.data;
-        generate_digits(digits.toString());
+        finish_game_setup(digits.toString());
     };
     digit_request.send();
 }

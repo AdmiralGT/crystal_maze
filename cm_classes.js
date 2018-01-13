@@ -1,14 +1,14 @@
 // Buttons that can be pressed by the user to turn off lights or reset the grid
-function Button(colour, text, text_colour, reset, radius)
+function Button(colour, text, text_colour, radius)
 {
 	this.colour = colour;
 	this.text = text;
 	this.text_colour = text_colour;
-	this.reset = reset;
 	this.radius = radius;
 	this.location = null;
 	this.button_id = null;
 	this.text_id = null;
+	this.reset = false;
     this.clicked = false;
 
 	this.setLocation = function(buttonLocation)
@@ -25,6 +25,11 @@ function Button(colour, text, text_colour, reset, radius)
 	{
 		this.text_id = textID;
 	}
+    
+    this.setReset = function(reset)
+    {
+        this.reset = reset;
+    }
 }
 
 // Class representing the segments that requiring turning off for a digit
