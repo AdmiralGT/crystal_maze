@@ -1,7 +1,10 @@
 var svgNS = "http://www.w3.org/2000/svg";
-var global_button_locations = new Array();
+
+// Do not change the order of global_button_list
 var global_button_list = new Array();
+var global_button_locations = new Array();
 var global_digit_list = new Array();
+var digit_segment_list = new Array();
 var lit = "#ffffcc"
 var switchboard_rows = 19;
 var switchboard_columns = 40;
@@ -14,7 +17,9 @@ var button_diameter = 2 * button_radius;
 var button_grid_width = Math.floor(switchboard_width / (button_diameter));
 var segment_size = 5;
 var total_segments = 0;
+var total_segments_on = 0;
 
+// Function to turn all lights on the switchboard on
 function turn_all_lights_on()
 {
 	for (row = 0; row < switchboard_rows; row++)
@@ -27,33 +32,35 @@ function turn_all_lights_on()
 	}
 }
 
-// Turn off some lights
-function change_lights()
+// Function to determine the next segment to turn off
+function determine_next_segment(segments_on)
 {
-	for (digit_num = 0; digit_num < global_digit_list.length; digit_num++)
-	{
-		var digit = global_digit_list[digit_num];
-		var digit_transform = transform_to_digit(digit_num);
-
-		for (segment_num = 0; segment_num < digit.segments.length; segment_num++)
-		{
-			var segment = digit.segments[segment_num];
-			if (segment.desired)
-			{
-				var transforms = transform_to_segment(segment.name, digit_transform);
-
-				for (transform_num = 0; transform_num < transforms.length; transform_num++)
-				{
-					var transform = transforms[transform_num];
-					var name = "#circle_" + transform.x + "_" + transform.y;
-					$(name).attr('fill', 'black');
-				}
-			}
-		}
-	}
+    var digit = digit_segment_list[segments_on];
+    for (var ii = 0; ii < digit.segments.length; ii++)
+    {
+        if (digit.segments[ii].name == digit.order.charAt(digit.active_segments))
+        {
+            return digit.segments[ii];
+        }
+    }
+    return null;
 }
 
-//
+// Turn off a specific segment
+function turn_off_segment(segment)
+{
+    var digit_transform = transform_to_digit(segment.digit_pos);
+    var transforms = transform_to_segment(segment.name, digit_transform);
+    
+    for (transform_num = 0; transform_num < transforms.length; transform_num++)
+    {
+        var transform = transforms[transform_num];
+        var name = "#circle_" + transform.x + "_" + transform.y;
+        $(name).attr('fill', 'black');
+    }
+}
+
+// Finds the position of the top left of a digit
 function transform_to_digit(digit)
 {
     var digit_width = segment_size + 2 + 2;
@@ -61,9 +68,10 @@ function transform_to_digit(digit)
     var total_height = (2 * segment_size) + 3;
     var horizontal_offset = Math.floor((switchboard_columns - total_width)/2);
     var vertical_offset = Math.floor((switchboard_rows - total_height)/2);
-	return new Transform((digit_width*digit) + horizontal_offset, vertical_offset);
+	return new Position((digit_width*digit) + horizontal_offset, vertical_offset);
 }
 
+// Find the positions of a segment
 function transform_to_segment(segment, digit_transform)
 {
 	var transforms = new Array();
@@ -72,113 +80,102 @@ function transform_to_segment(segment, digit_transform)
 	{
 		for (var ii = 0; ii < segment_size; ii++)
 		{
-			transforms.push(new Transform(digit_transform.x + ii + 1,
-			                              digit_transform.y));
+			transforms.push(new Position(digit_transform.x + ii + 1,
+			                             digit_transform.y));
 		}
 	}
 	else if (segment == 'b')
 	{
 		for (var ii = 0; ii < segment_size; ii++)
 		{
-			transforms.push(new Transform(digit_transform.x + segment_offset,
-			                              digit_transform.y + ii + 1));
+			transforms.push(new Position(digit_transform.x + segment_offset,
+			                             digit_transform.y + ii + 1));
 		}
 	}
 	else if (segment == 'c')
 	{
 		for (var ii = 0; ii < segment_size; ii++)
 		{
-			transforms.push(new Transform(digit_transform.x + segment_offset,
-			                              digit_transform.y + ii + segment_offset + 1));
+			transforms.push(new Position(digit_transform.x + segment_offset,
+			                             digit_transform.y + ii + segment_offset + 1));
 		}
 	}
 	else if (segment == 'd')
 	{
 		for (var ii = 0; ii < segment_size; ii++)
 		{
-			transforms.push(new Transform(digit_transform.x + ii + 1,
-			                              digit_transform.y + (2 * segment_offset)));
+			transforms.push(new Position(digit_transform.x + ii + 1,
+			                             digit_transform.y + (2 * segment_offset)));
 		}
 	}
 	else if (segment == 'e')
 	{
 		for (var ii = 0; ii < segment_size; ii++)
 		{
-			transforms.push(new Transform(digit_transform.x,
-			                              digit_transform.y + ii + segment_offset + 1));
+			transforms.push(new Position(digit_transform.x,
+			                             digit_transform.y + ii + segment_offset + 1));
 		}
 	}
 	else if (segment == 'f')
 	{
 		for (var ii = 0; ii < segment_size; ii++)
 		{
-			transforms.push(new Transform(digit_transform.x,
-			                              digit_transform.y + ii + 1));
+			transforms.push(new Position(digit_transform.x,
+			                             digit_transform.y + ii + 1));
 		}
 	}
 	else if (segment == 'g')
 	{
 		for (var ii = 0; ii < segment_size; ii++)
 		{
-			transforms.push(new Transform(digit_transform.x + ii + 1,
-			                              digit_transform.y + segment_offset));
+			transforms.push(new Position(digit_transform.x + ii + 1,
+			                             digit_transform.y + segment_offset));
 		}
 	}
 	return transforms;
 }
 
-// How to transform position from the top left of the switch board
-function Transform(x, y)
+// Reset the game state
+function reset_game()
 {
-	this.x = x;
-	this.y = y;
+    // Reset the list of active segments on each digit
+    for (var ii = 0; ii < global_digit_list.length; ii++)
+    {
+        global_digit_list[ii].active_segments = 0;
+    }
+    total_segments_on = 0;
 }
 
-// Just a function that turns some lights off for testing.
-function change_lights_test()
+// Determine which buttons are going to be reset buttons
+function create_reset_buttons()
 {
-	colour = 'black';
+    var reset_array = new Array();
+    
+    // Each segment needs a valid button to press
+    for (var ii = 0; ii < total_segments; ii++)
+    {
+        reset_array.push(false);
+    }
+    
+    // Remaining segments are all reset buttons
+    for (var ii = 0; ii < global_button_list.length - total_segments; ii++)
+    {
+        reset_array.push(true);
+    }
+    
+    // Shuffle the array to randomise and then assign to buttons
+    shuffle(reset_array);
+    for (var ii = 0; ii < reset_array.length; ii++)
+    {
+        global_button_list[ii].setReset(reset_array[ii]);
+    }
+}
 
-	$("#circle_4_3").attr('fill', colour);
-	$("#circle_5_3").attr('fill', colour);
-	$("#circle_6_3").attr('fill', colour);
-	$("#circle_3_4").attr('fill', colour);
-	$("#circle_3_5").attr('fill', colour);
-	$("#circle_3_6").attr('fill', colour);
-	$("#circle_7_4").attr('fill', colour);
-	$("#circle_7_5").attr('fill', colour);
-	$("#circle_7_6").attr('fill', colour);
-	$("#circle_4_7").attr('fill', colour);
-	$("#circle_5_7").attr('fill', colour);
-	$("#circle_6_7").attr('fill', colour);
-	$("#circle_3_8").attr('fill', colour);
-	$("#circle_3_9").attr('fill', colour);
-	$("#circle_3_10").attr('fill', colour);
-	$("#circle_7_8").attr('fill', colour);
-	$("#circle_7_9").attr('fill', colour);
-	$("#circle_7_10").attr('fill', colour);
-	$("#circle_4_11").attr('fill', colour);
-	$("#circle_5_11").attr('fill', colour);
-	$("#circle_6_11").attr('fill', colour);
-
-	$("#circle_11_3").attr('fill', colour);
-	$("#circle_12_3").attr('fill', colour);
-	$("#circle_13_3").attr('fill', colour);
-	$("#circle_11_11").attr('fill', colour);
-	$("#circle_12_11").attr('fill', colour);
-	$("#circle_13_11").attr('fill', colour);
-	$("#circle_10_4").attr('fill', colour);
-	$("#circle_10_5").attr('fill', colour);
-	$("#circle_10_6").attr('fill', colour);
-	$("#circle_14_4").attr('fill', colour);
-	$("#circle_14_5").attr('fill', colour);
-	$("#circle_14_6").attr('fill', colour);
-	$("#circle_10_8").attr('fill', colour);
-	$("#circle_10_9").attr('fill', colour);
-	$("#circle_10_10").attr('fill', colour);
-	$("#circle_14_8").attr('fill', colour);
-	$("#circle_14_9").attr('fill', colour);
-	$("#circle_14_10").attr('fill', colour);
+// Complete game setup, generate the digits and create reset buttons
+function finish_game_setup(digits)
+{
+    generate_digits(digits);
+    create_reset_buttons();
 }
 
 // Function called when a button is pressed
@@ -189,12 +186,19 @@ function test()
     if (button.reset)
     {
     	turn_all_lights_on();
-	   	shuffleButtons();
+        reset_game();
+	   	reset_buttons();
     }
-    else
+    else if (button.clicked == false)
     {
-    	change_lights();
-    	//change_lights_test();
+        if (total_segments_on < total_segments)
+        {
+            button.clicked = true;
+            var segment = determine_next_segment(total_segments_on);
+            turn_off_segment(segment);
+            total_segments_on++;
+            global_digit_list[segment.digit_pos].active_segments++;
+        }
     }
 
 }
@@ -280,36 +284,54 @@ function generate_button_grid()
 		g.appendChild(text);
 
 	}
-	shuffleButtons();
+	reset_buttons();
 }
 
 // Function to build a button and put it in the global list of buttons.
-function make_button(colour, text, text_colour, reset)
+function make_button(colour, text, text_colour)
 {
-    var button = new Button(colour, text, text_colour, reset, button_radius);
+    var button = new Button(colour, text, text_colour, button_radius);
     global_button_list.push(button);
 }
 
 // Function that generates all our necessary buttons
 function generate_buttons()
 {
-	make_button("red", "RED", "black", false);
-	make_button("black", "BLACK", "white", true);
-	make_button("blue", "BLUE", "black", false);
-	make_button("orange", "ORANGE", "black", false);
-	make_button("yellow", "YELLOW", "black", false);
-	make_button("green", "GREEN", "black", false);
-	make_button("red", "RED", "black", false);
-	make_button("black", "BLACK", "white", true);
-	make_button("blue", "BLUE", "black", false);
-	make_button("orange", "ORANGE", "black", false);
-	make_button("yellow", "YELLOW", "black", false);
-	make_button("green", "GREEN", "black", false);
+	make_button("red", "1", "black");
+	make_button("black", "2", "white");
+	make_button("blue", "3", "black");
+	make_button("orange", "4", "black");
+	make_button("yellow", "5", "black");
+	make_button("green", "6", "black");
+	make_button("red", "7", "black");
+	make_button("black", "8", "white");
+	make_button("blue", "9", "black");
+	make_button("orange", "10", "black");
+	make_button("yellow", "11", "black");
+	make_button("green", "12", "black");
+	make_button("red", "13", "black");
+	make_button("black", "14", "white");
+	make_button("blue", "15", "black");
+	make_button("orange", "16", "black");
+	make_button("yellow", "17", "black");
+	make_button("green", "18", "black");
+	make_button("red", "19", "black");
+	make_button("black", "20", "white");
+	make_button("blue", "21", "black");
+	make_button("orange", "22", "black");
+	make_button("yellow", "23", "black");
+	make_button("green", "24", "black");
+	make_button("red", "25", "black");
+	make_button("black", "26", "white");
+	make_button("blue", "27", "black");
+	make_button("orange", "28", "black");
+	make_button("yellow", "29", "black");
+	make_button("green", "30", "black");
 
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
-		var button_location = new ButtonLocation((button_diameter * (button_num % button_grid_width)) + button_radius, 
-                                                 (button_diameter*Math.floor(button_num/button_grid_width)) + button_radius);
+		var button_location = new Position((button_diameter * (button_num % button_grid_width)) + button_radius, 
+                                           (button_diameter*Math.floor(button_num/button_grid_width)) + button_radius);
 		global_button_locations.push(button_location);
 	}
 }
@@ -317,14 +339,30 @@ function generate_buttons()
 // Function to generate the digits to determine which lights to turn off
 function generate_digits(digit_string)
 {
+    var last_digit_segments = new Array();
 	for (var ii = 0; ii < digit_string.length; ii++)
 	{
 		var digit = create_digit(digit_string.charAt(ii));
 		digit.setPosition(ii);
         total_segments += digit.desired_segments;
 		global_digit_list.push(digit);
+        
+        // Save one segment so each digit is only finished at the end of the game
+        for (var jj = 0; jj < digit.desired_segments - 1; jj++)
+        {
+            digit_segment_list.push(digit);
+        }
+        last_digit_segments.push(digit);
 	}
-    alert(total_segments);
+    shuffle(digit_segment_list);
+    shuffle(last_digit_segments);
+    
+    // Pushing an array to the end of an array does add the elements to the end but 
+    // instead adds an Array object at the original array index. Thanks Javascript...
+    for (var ii = 0; ii < last_digit_segments.length; ii++)
+    {
+        digit_segment_list.push(last_digit_segments[ii]);
+    }
 }
 
 // Function to create a Digit object for a string
@@ -334,43 +372,43 @@ function create_digit(digit)
 {
 	if (digit == '0')
 	{
-		return new Digit(true, true, true, true, true, true, false);
+		return new Digit(true, true, true, true, true, true, false, 'cbaefd');
 	}
 	else if (digit == '1')
 	{
-		return new Digit(false, true, true, false, false, false, false);
+		return new Digit(false, true, true, false, false, false, false, 'bc');
 	}
 	else if (digit == '2')
 	{
-		return new Digit(true, true, false, true, true, false, true);
+		return new Digit(true, true, false, true, true, false, true, 'dgabe');
 	}
 	else if (digit == '3')
 	{
-		return new Digit(true, true, true, true, false, false, true);
+		return new Digit(true, true, true, true, false, false, true, 'abgdc');
 	}
 	else if (digit == '4')
 	{
-		return new Digit(false, true, true, false, false, true, true);
+		return new Digit(false, true, true, false, false, true, true, 'cbgf');
 	}
 	else if (digit == '5')
 	{
-		return new Digit(true, false, true, true, false, true, true);
+		return new Digit(true, false, true, true, false, true, true, 'adgcf');
 	}
 	else if (digit == '6')
 	{
-		return new Digit(true, false, true, true, true, true, true);
+		return new Digit(true, false, true, true, true, true, true, 'gdacfe');
 	}
 	else if (digit == '7')
 	{
-		return new Digit(true, true, true, false, false, false, false);
+		return new Digit(true, true, true, false, false, false, false, 'cba');
 	}
 	else if (digit == '8')
 	{
-		return new Digit(true, true, true, true, true, true, true);
+		return new Digit(true, true, true, true, true, true, true, 'gadcfeb');
 	}
 	else if (digit == '9')
 	{
-		return new Digit(true, true, true, true, false, true, true);
+		return new Digit(true, true, true, true, false, true, true, 'gcfdab');
 	}
 	else
 	{
@@ -387,97 +425,19 @@ function generate_game()
 	loadjsondata('answer');
 }
 
-// Buttons that can be pressed by the user to turn off lights or reset the grid
-function Button(colour, text, text_colour, reset, radius)
-{
-	this.colour = colour;
-	this.text = text;
-	this.text_colour = text_colour;
-	this.reset = reset;
-	this.radius = radius;
-	this.location = null;
-	this.button_id = null;
-	this.text_id = null;
-
-	this.setLocation = function(buttonLocation)
-	{
-		this.location = buttonLocation;
-	}
-
-	this.setButtonID = function(buttonID)
-	{
-		this.button_id = buttonID;
-	}
-
-	this.setTextID = function(textID)
-	{
-		this.text_id = textID;
-	}
-}
-
-// Class representing the location in the button grid where a button is drawn
-function ButtonLocation(x, y)
-{
-	this.x = x;
-	this.y = y;
-}
-
-// A segment of lights that make up a digit
-function Segment(seg, desired)
-{
-	this.name = seg;
-	this.desired = desired;
-	this.current = false;
-}
-
-// Class representing the segments that requiring turning off for a digit
-function Digit(a, b, c, d, e, f, g, h)
-{
-	this.segments = new Array();
-	this.segments.push(new Segment('a', a));
-	this.segments.push(new Segment('b', b));
-	this.segments.push(new Segment('c', c));
-	this.segments.push(new Segment('d', d));
-	this.segments.push(new Segment('e', e));
-	this.segments.push(new Segment('f', f));
-	this.segments.push(new Segment('g', g));
-	this.pos = 0;
-    this.desired_segments = 0;
-    for (var ii = 0; ii < this.segments.length; ii++)
-    {
-        if (this.segments[ii].desired)
-        {
-            this.desired_segments++;
-        }
-    }
-
-	this.setPosition = function(pos)
-	{
-		this.position = pos;
-	}
-}
-
-// Get a random int between a minimum and maximum value (inclusive).
-function getRandomInt(min, max)
-{
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 // Shuffle the order of buttons around on the display.
-function shuffleButtons()
+function reset_buttons()
 {
-	var local_button_locations = global_button_locations.slice(0);
+    // Shuffle the button locations
+    shuffle(global_button_locations);
+
+    // Update the button location of each button
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
-		// Choose a random button and update it's location.
-		var index = getRandomInt(0, local_button_locations.length - 1);
 		var button = global_button_list[button_num];
-		var location = local_button_locations[index];
-		button.setLocation(location);
+		button.setLocation(global_button_locations[button_num]);
 		redraw_button(button);
-
-		// Remove this button for the list of buttons to shuffle.
-		local_button_locations.splice(index, 1);
+        button.clicked = false;
 	}
 }
 
@@ -513,7 +473,8 @@ function loadjsondata(url)
     digit_request.onload = function (e) {
         var json = eval('(' + digit_request.responseText + ')');
         var digits = json.data;
-        generate_digits(digits.toString());
+        finish_game_setup(digits.toString());
     };
     digit_request.send();
 }
+
