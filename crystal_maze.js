@@ -301,6 +301,24 @@ function generate_buttons()
 	make_button("orange", "ORANGE", "black", false);
 	make_button("yellow", "YELLOW", "black", false);
 	make_button("green", "GREEN", "black", false);
+	make_button("red", "RED", "black", false);
+	make_button("black", "BLACK", "white", true);
+	make_button("blue", "BLUE", "black", false);
+	make_button("orange", "ORANGE", "black", false);
+	make_button("yellow", "YELLOW", "black", false);
+	make_button("green", "GREEN", "black", false);
+	make_button("red", "RED", "black", false);
+	make_button("black", "BLACK", "white", true);
+	make_button("blue", "BLUE", "black", false);
+	make_button("orange", "ORANGE", "black", false);
+	make_button("yellow", "YELLOW", "black", false);
+	make_button("green", "GREEN", "black", false);
+	make_button("red", "RED", "black", false);
+	make_button("black", "BLACK", "white", true);
+	make_button("blue", "BLUE", "black", false);
+	make_button("orange", "ORANGE", "black", false);
+	make_button("yellow", "YELLOW", "black", false);
+	make_button("green", "GREEN", "black", false);
 
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
@@ -313,6 +331,7 @@ function generate_buttons()
 // Function to generate the digits to determine which lights to turn off
 function generate_digits(digit_string)
 {
+    var last_digit_segments = new Array();
 	for (var ii = 0; ii < digit_string.length; ii++)
 	{
 		var digit = create_digit(digit_string.charAt(ii));
@@ -320,12 +339,22 @@ function generate_digits(digit_string)
         total_segments += digit.desired_segments;
 		global_digit_list.push(digit);
         
-        for (var jj = 0; jj < digit.desired_segments; jj++)
+        // Save one segment so each digit is only finished at the end of the game
+        for (var jj = 0; jj < digit.desired_segments - 1; jj++)
         {
             digit_segment_list.push(digit);
         }
+        last_digit_segments.push(digit);
 	}
     shuffle(digit_segment_list);
+    shuffle(last_digit_segments);
+    
+    // Pushing an array to the end of an array does add the elements to the end but 
+    // instead adds an Array object at the original array index. Thanks Javascript...
+    for (var ii = 0; ii < last_digit_segments.length; ii++)
+    {
+        digit_segment_list.push(last_digit_segments[ii]);
+    }
 }
 
 // Function to create a Digit object for a string
