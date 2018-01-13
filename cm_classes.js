@@ -9,6 +9,7 @@ function Button(colour, text, text_colour, reset, radius)
 	this.location = null;
 	this.button_id = null;
 	this.text_id = null;
+    this.clicked = false;
 
 	this.setLocation = function(buttonLocation)
 	{

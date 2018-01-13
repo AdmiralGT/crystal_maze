@@ -179,12 +179,13 @@ function test()
     {
     	turn_all_lights_on();
         reset_game();
-	   	shuffleButtons();
+	   	reset_buttons();
     }
-    else
+    else if (button.clicked == false)
     {
         if (total_segments_on < total_segments)
         {
+            button.clicked = true;
             var segment = determine_next_segment(total_segments_on);
             turn_off_segment(segment);
             total_segments_on++;
@@ -275,7 +276,7 @@ function generate_button_grid()
 		g.appendChild(text);
 
 	}
-	shuffleButtons();
+	reset_buttons();
 }
 
 // Function to build a button and put it in the global list of buttons.
@@ -388,7 +389,7 @@ function generate_game()
 }
 
 // Shuffle the order of buttons around on the display.
-function shuffleButtons()
+function reset_buttons()
 {
     // Shuffle the button locations
     shuffle(global_button_locations);
@@ -399,6 +400,7 @@ function shuffleButtons()
 		var button = global_button_list[button_num];
 		button.setLocation(global_button_locations[button_num]);
 		redraw_button(button);
+        button.clicked = false;
 	}
 }
 
