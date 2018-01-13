@@ -27,7 +27,7 @@ function Button(colour, text, text_colour, reset, radius)
 }
 
 // Class representing the segments that requiring turning off for a digit
-function Digit(a, b, c, d, e, f, g, h, order)
+function Digit(a, b, c, d, e, f, g, order)
 {
 	this.segments = new Array();
 	this.segments.push(new Segment('a', a));
@@ -37,7 +37,7 @@ function Digit(a, b, c, d, e, f, g, h, order)
 	this.segments.push(new Segment('e', e));
 	this.segments.push(new Segment('f', f));
 	this.segments.push(new Segment('g', g));
-	this.pos = 0;
+	this.position = 0;
     this.desired_segments = 0;
     this.active_segments = 0;
     this.order = order;
