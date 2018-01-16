@@ -238,7 +238,7 @@ function generate_switch_grid()
 function generate_button_grid()
 {
 	// All buttons have the same border for now...
-	var stroke = "block";
+	var stroke = "black";
 	var stroke_width = 2;
 
 	// Generate the general SVG area to put buttons in.
@@ -276,7 +276,7 @@ function generate_button_grid()
 		var text_id = "text_for_" + button_id;
 		button.setTextID(text_id);
 		text.setAttributeNS(null, 'id', text_id);
-		text.setAttributeNS(null, 'style', 'fill: ' + button.text_colour);
+		text.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: 2em; dominant-baseline: middle');
 		text.setAttributeNS(null, 'text-anchor', 'middle');
 		text.setAttributeNS(null, 'onmousedown', 'test()');
 		var text_node = document.createTextNode(button.text);
