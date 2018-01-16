@@ -51,7 +51,7 @@ function turn_off_segment(segment)
 {
     var digit_transform = transform_to_digit(segment.digit_pos);
     var transforms = transform_to_segment(segment.name, digit_transform);
-    
+
     for (transform_num = 0; transform_num < transforms.length; transform_num++)
     {
         var transform = transforms[transform_num];
@@ -150,19 +150,19 @@ function reset_game()
 function create_reset_buttons()
 {
     var reset_array = new Array();
-    
+
     // Each segment needs a valid button to press
     for (var ii = 0; ii < total_segments; ii++)
     {
         reset_array.push(false);
     }
-    
+
     // Remaining segments are all reset buttons
     for (var ii = 0; ii < global_button_list.length - total_segments; ii++)
     {
         reset_array.push(true);
     }
-    
+
     // Shuffle the array to randomise and then assign to buttons
     shuffle(reset_array);
     for (var ii = 0; ii < reset_array.length; ii++)
@@ -267,7 +267,7 @@ function generate_button_grid()
 		button_element.setAttributeNS(null, 'fill', button.colour);
 		button_element.setAttributeNS(null, 'stroke', stroke);
 		button_element.setAttributeNS(null, 'stroke-width', stroke_width);
-		button_element.setAttributeNS(null, 'onclick', 'test()');
+		button_element.setAttributeNS(null, 'onmousedown', 'test()');
 
 		// Put the Button element in the group.
 		g.appendChild(button_element);
@@ -278,7 +278,7 @@ function generate_button_grid()
 		text.setAttributeNS(null, 'id', text_id);
 		text.setAttributeNS(null, 'style', 'fill: ' + button.text_colour);
 		text.setAttributeNS(null, 'text-anchor', 'middle');
-		text.setAttributeNS(null, 'onclick', 'test()');
+		text.setAttributeNS(null, 'onmousedown', 'test()');
 		var text_node = document.createTextNode(button.text);
 		text.appendChild(text_node);
 		g.appendChild(text);
@@ -330,7 +330,7 @@ function generate_buttons()
 
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
-		var button_location = new Position((button_diameter * (button_num % button_grid_width)) + button_radius, 
+		var button_location = new Position((button_diameter * (button_num % button_grid_width)) + button_radius,
                                            (button_diameter*Math.floor(button_num/button_grid_width)) + button_radius);
 		global_button_locations.push(button_location);
 	}
@@ -346,7 +346,7 @@ function generate_digits(digit_string)
 		digit.setPosition(ii);
         total_segments += digit.desired_segments;
 		global_digit_list.push(digit);
-        
+
         // Save one segment so each digit is only finished at the end of the game
         for (var jj = 0; jj < digit.desired_segments - 1; jj++)
         {
@@ -356,8 +356,8 @@ function generate_digits(digit_string)
 	}
     shuffle(digit_segment_list);
     shuffle(last_digit_segments);
-    
-    // Pushing an array to the end of an array does add the elements to the end but 
+
+    // Pushing an array to the end of an array does add the elements to the end but
     // instead adds an Array object at the original array index. Thanks Javascript...
     for (var ii = 0; ii < last_digit_segments.length; ii++)
     {
