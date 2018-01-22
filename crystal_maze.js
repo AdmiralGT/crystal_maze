@@ -161,7 +161,7 @@ function reset_game()
     {
 		var button = global_button_list[button_num];
         button.clicked = false;
-        $("#" + button.button_id).attr('fill', "white");
+        $("#" + button.button_id).attr('fill', button.colour);
     }
 }
 
