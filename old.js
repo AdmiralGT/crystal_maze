@@ -24,3 +24,5 @@ function change_lights()
 	}
 }
 
+//var button_location = new Position((button_diameter * (button_num % button_grid_width)) + button_radius,
+//                                   (button_diameter*Math.floor(button_num/button_grid_width)) + button_radius);
