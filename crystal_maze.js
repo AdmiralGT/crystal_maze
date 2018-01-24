@@ -5,13 +5,24 @@ var global_button_list = new Array();
 var global_button_locations = new Array();
 var global_digit_list = new Array();
 var digit_segment_list = new Array();
-var lit = "#ffffcc"
+
+// Variables for the total SVG area
+var svg_width = 1200;
+var svg_height = 675
+
+// Variables for the group of lights that turn off to reveal the code
+var lit = "#ffffcc";
 var switchboard_rows = 19;
 var switchboard_columns = 40;
-var switchboard_radius = 10;
+var switchboard_radius = 7.5;
 var switchboard_diameter = 2 * switchboard_radius;
 var switchboard_width = switchboard_diameter * switchboard_columns;
 var switchboard_height = switchboard_diameter * switchboard_rows;
+var switchboard_x_offset = (svg_width - switchboard_width)/2
+
+// Variables for the buttons that can be pressed
+//var button_pressed = "#ffe6e6"; // This possibly makes it too easy
+var button_pressed = "white";
 var button_radius = 40;
 var button_diameter = 2 * button_radius;
 var button_grid_width = Math.floor(switchboard_width / (button_diameter));
@@ -144,6 +155,14 @@ function reset_game()
         global_digit_list[ii].active_segments = 0;
     }
     total_segments_on = 0;
+
+    // Reset the state of every button
+    for (var button_num = 0; button_num < global_button_list.length; button_num++)
+    {
+		var button = global_button_list[button_num];
+        button.clicked = false;
+        $("#" + button.button_id).attr('fill', button.colour);
+    }
 }
 
 // Determine which buttons are going to be reset buttons
@@ -179,7 +198,7 @@ function finish_game_setup(digits)
 }
 
 // Function called when a button is pressed
-function test()
+function button_press()
 {
     var button = getButtonFromElementID(this.event.target.id);
 
@@ -187,7 +206,6 @@ function test()
     {
     	turn_all_lights_on();
         reset_game();
-	   	reset_buttons();
     }
     else if (button.clicked == false)
     {
@@ -198,6 +216,7 @@ function test()
             turn_off_segment(segment);
             total_segments_on++;
             global_digit_list[segment.digit_pos].active_segments++;
+            $("#" + button.button_id).attr('fill', button_pressed);
         }
     }
 
@@ -206,16 +225,16 @@ function test()
 // Generate the grid of lightbulbs that will be turned off to reveal the code.
 function generate_switch_grid()
 {
-	var grid_svg = document.getElementById("lightboard_grid");
-	grid_svg.setAttribute("width", switchboard_width);
-	grid_svg.setAttribute("height", switchboard_height);
+	var grid_svg = document.getElementById("svg_area");
+    var g = document.createElementNS(svgNS, "g");
+    grid_svg.appendChild(g);
 	for (var row = 0; row < switchboard_rows; row++)
 	{
 		for (var column = 0; column < switchboard_columns; column++)
 		{
 			var circle = document.createElementNS(svgNS, "circle");
 			var id = "circle_" + column + "_" + row;
-			var centre_x = (column * switchboard_diameter) + switchboard_radius;
+			var centre_x = (column * switchboard_diameter) + switchboard_radius + switchboard_x_offset;
 			var centre_y = (row * switchboard_diameter) + switchboard_radius;
 			var colour = "red";
 			var stroke = "black";
@@ -228,7 +247,7 @@ function generate_switch_grid()
 			circle.setAttributeNS(null, 'stroke', stroke);
 			circle.setAttributeNS(null, 'stroke-width', stroke_width);
 
-			grid_svg.appendChild(circle);
+			g.appendChild(circle);
 		}
 	}
 }
@@ -243,9 +262,7 @@ function generate_button_grid()
 
 	// Generate the general SVG area to put buttons in.
     var height = 300;
-	var switch_svg = document.getElementById("switch_grid");
-	switch_svg.setAttribute("width", switchboard_width);
-	switch_svg.setAttribute("height", height);
+	var switch_svg = document.getElementById("svg_area");
 
 	// Generate a local copy of the global button list as we're going to remove elements from it
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
@@ -267,7 +284,7 @@ function generate_button_grid()
 		button_element.setAttributeNS(null, 'fill', button.colour);
 		button_element.setAttributeNS(null, 'stroke', stroke);
 		button_element.setAttributeNS(null, 'stroke-width', stroke_width);
-		button_element.setAttributeNS(null, 'onmousedown', 'test()');
+		button_element.setAttributeNS(null, 'onmousedown', 'button_press()');
 
 		// Put the Button element in the group.
 		g.appendChild(button_element);
@@ -278,19 +295,20 @@ function generate_button_grid()
 		text.setAttributeNS(null, 'id', text_id);
 		text.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: 2em; dominant-baseline: middle');
 		text.setAttributeNS(null, 'text-anchor', 'middle');
-		text.setAttributeNS(null, 'onmousedown', 'test()');
+		text.setAttributeNS(null, 'onmousedown', 'button_press()');
 		var text_node = document.createTextNode(button.text);
 		text.appendChild(text_node);
 		g.appendChild(text);
 
 	}
-	reset_buttons();
+	randomise_buttons();
 }
 
 // Function to build a button and put it in the global list of buttons.
 function make_button(colour, text, text_colour)
 {
-    var button = new Button(colour, text, text_colour, button_radius);
+    //var button = new Button(colour, text, text_colour, button_radius);
+    var button = new Button("white", text, "black", button_radius);
     global_button_list.push(button);
 }
 
@@ -327,14 +345,68 @@ function generate_buttons()
 	make_button("orange", "28", "black");
 	make_button("yellow", "29", "black");
 	make_button("green", "30", "black");
-
+    
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
-		var button_location = new Position((button_diameter * (button_num % button_grid_width)) + button_radius,
-                                           (button_diameter*Math.floor(button_num/button_grid_width)) + button_radius);
+        button_location = generate_button_location()
 		global_button_locations.push(button_location);
 	}
 }
+
+// Function to generate a button location.
+function generate_button_location()
+{
+    var valid_location = false;
+    var x;
+    var y;
+    while (valid_location != true)
+    {
+        x = getRandomInt(button_radius, svg_width - button_radius);
+        y = getRandomInt(button_radius, svg_height - button_radius);
+        var pos = new Position(x,y);
+        valid_location = !determine_button_overlap(pos)
+    }
+    return pos;
+}
+
+// Function to determine if this button can be drawn or is too close to another button.
+function determine_button_overlap(pos)
+{
+    // Check button does not overlap switchboard
+    if (pos.y <= (switchboard_height + button_radius))
+    {
+        if (pos.x >= (switchboard_x_offset - button_radius))
+        {
+            if (pos.x <= ((svg_width + button_radius) - switchboard_x_offset))
+            {
+                return true;
+            }
+        }
+    }
+    for (var button_num = 0; button_num < global_button_locations.length; button_num++)
+    {
+        var button_location = global_button_locations[button_num];
+        if (overlap(pos, button_location))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Function to determine if two buttons overlap
+function overlap(pos_1, pos_2)
+{
+    var x_diff = pos_2.x - pos_1.x;
+    var y_diff = pos_2.y - pos_1.y;
+    var square_distance = Math.pow(x_diff, 2) + Math.pow(y_diff, 2);
+    if (Math.pow(square_distance, 0.5) < (button_diameter + 20))
+    {
+        return true;
+    }
+    return false;
+}
+    
 
 // Function to generate the digits to determine which lights to turn off
 function generate_digits(digit_string)
@@ -419,14 +491,22 @@ function create_digit(digit)
 // Used on page load to generate the light grid and buttons that will be in game
 function generate_game()
 {
+    size_objects();
 	generate_switch_grid();
 	generate_buttons();
 	generate_button_grid();
 	loadjsondata('answer');
 }
 
+function size_objects()
+{
+	var svg_area = document.getElementById("svg_area");
+    svg_area.setAttribute("width", svg_width);
+    svg_area.setAttribute("height", svg_height);
+}    
+
 // Shuffle the order of buttons around on the display.
-function reset_buttons()
+function randomise_buttons()
 {
     // Shuffle the button locations
     shuffle(global_button_locations);
@@ -437,7 +517,6 @@ function reset_buttons()
 		var button = global_button_list[button_num];
 		button.setLocation(global_button_locations[button_num]);
 		redraw_button(button);
-        button.clicked = false;
 	}
 }
 
