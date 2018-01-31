@@ -315,36 +315,10 @@ function make_button(colour, text, text_colour)
 // Function that generates all our necessary buttons
 function generate_buttons()
 {
-	make_button("red", "1", "black");
-	make_button("black", "2", "white");
-	make_button("blue", "3", "white");
-	make_button("orange", "4", "black");
-	make_button("yellow", "5", "black");
-	make_button("green", "6", "black");
-	make_button("red", "7", "black");
-	make_button("black", "8", "white");
-	make_button("blue", "9", "white");
-	make_button("orange", "10", "black");
-	make_button("yellow", "11", "black");
-	make_button("green", "12", "black");
-	make_button("red", "13", "black");
-	make_button("black", "14", "white");
-	make_button("blue", "15", "white");
-	make_button("orange", "16", "black");
-	make_button("yellow", "17", "black");
-	make_button("green", "18", "black");
-	make_button("red", "19", "black");
-	make_button("black", "20", "white");
-	make_button("blue", "21", "white");
-	make_button("orange", "22", "black");
-	make_button("yellow", "23", "black");
-	make_button("green", "24", "black");
-	make_button("red", "25", "black");
-	make_button("black", "26", "white");
-	make_button("blue", "27", "white");
-	make_button("orange", "28", "black");
-	make_button("yellow", "29", "black");
-	make_button("green", "30", "black");
+    for (var ii = 0; ii < 32; ii++)
+    {
+        //make_button("white", ii + 1, "black");
+    }
     
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
@@ -492,12 +466,25 @@ function create_digit(digit)
 function generate_game()
 {
     size_objects();
-	generate_switch_grid();
+	//generate_switch_grid();
+    generate_input_and_button();
 	generate_buttons();
 	generate_button_grid();
-	loadjsondata('answer');
+	//loadjsondata('answer');
 }
 
+function generate_input_and_button()
+{
+    var gameboard = document.getElementById('gameboard');
+    var div = document.createElement('div');
+    div.setAttribute('id', 'GRT');
+    var input = document.createElement('input');
+    input.type = 'text'
+    div.appendChild(input);
+    gameboard.appendChild(div);
+}
+
+// Used to size the area in which we can draw buttons/lights
 function size_objects()
 {
 	var svg_area = document.getElementById("svg_area");
