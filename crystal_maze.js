@@ -29,6 +29,7 @@ var button_grid_width = Math.floor(switchboard_width / (button_diameter));
 var segment_size = 5;
 var total_segments = 0;
 var total_segments_on = 0;
+var score = 0;
 
 // Function to turn all lights on the switchboard on
 function turn_all_lights_on()
@@ -195,6 +196,7 @@ function finish_game_setup(digits)
 {
     generate_digits(digits);
     create_reset_buttons();
+    score = 10;
 }
 
 // Function called when a button is pressed
@@ -315,36 +317,10 @@ function make_button(colour, text, text_colour)
 // Function that generates all our necessary buttons
 function generate_buttons()
 {
-	make_button("red", "1", "black");
-	make_button("black", "2", "white");
-	make_button("blue", "3", "white");
-	make_button("orange", "4", "black");
-	make_button("yellow", "5", "black");
-	make_button("green", "6", "black");
-	make_button("red", "7", "black");
-	make_button("black", "8", "white");
-	make_button("blue", "9", "white");
-	make_button("orange", "10", "black");
-	make_button("yellow", "11", "black");
-	make_button("green", "12", "black");
-	make_button("red", "13", "black");
-	make_button("black", "14", "white");
-	make_button("blue", "15", "white");
-	make_button("orange", "16", "black");
-	make_button("yellow", "17", "black");
-	make_button("green", "18", "black");
-	make_button("red", "19", "black");
-	make_button("black", "20", "white");
-	make_button("blue", "21", "white");
-	make_button("orange", "22", "black");
-	make_button("yellow", "23", "black");
-	make_button("green", "24", "black");
-	make_button("red", "25", "black");
-	make_button("black", "26", "white");
-	make_button("blue", "27", "white");
-	make_button("orange", "28", "black");
-	make_button("yellow", "29", "black");
-	make_button("green", "30", "black");
+    for (var ii = 0; ii < 32; ii++)
+    {
+        make_button("white", ii + 1, "black");
+    }
     
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
@@ -493,11 +469,30 @@ function generate_game()
 {
     size_objects();
 	generate_switch_grid();
+    generate_input_and_button();
 	generate_buttons();
 	generate_button_grid();
 	loadjsondata('answer');
 }
 
+function generate_input_and_button()
+{
+    var gameboard = document.getElementById('gameboard');
+    var div = document.createElement('div');
+    div.setAttribute('id', 'guess_div');
+    var input = document.createElement('input');
+    input.type = 'text'
+    input.setAttribute('id', 'guess_textbox');
+    div.appendChild(input);
+    var button = document.createElement('button');
+    button.innerHTML = "Guess";
+    button.setAttribute('onclick', 'guess()');
+    button.setAttribute('id', 'guess_button');
+    div.appendChild(button);
+    gameboard.appendChild(div);
+}
+
+// Used to size the area in which we can draw buttons/lights
 function size_objects()
 {
 	var svg_area = document.getElementById("svg_area");
@@ -543,17 +538,50 @@ function getButtonFromElementID(elementID)
     return button;
 }
 
+// Get answer
+function get_answer(url)
+{
+    var digit_request = new XMLHttpRequest();
+    digit_request.open("GET", url, true);
+    return digit_request;
+}
+
 // Makes a request to the server to get the code.
 function loadjsondata(url)
 {
     // first load the Ajax; load the pics file @@jquery this?
-    var digit_request = new XMLHttpRequest();
-    digit_request.open("GET", 'answer', true);
+    var digit_request = get_answer(url);
     digit_request.onload = function (e) {
         var json = eval('(' + digit_request.responseText + ')');
         var digits = json.data;
         finish_game_setup(digits.toString());
     };
     digit_request.send();
+}
+
+// Someone is attempting to guess the answer.
+function guess()
+{
+    var digit_request = get_answer('answer');
+    digit_request.onload = function (e) {
+        var json = eval('(' + digit_request.responseText + ')');
+        var digits = json.data;
+        determine_if_guess_correct(digits);
+    };
+    digit_request.send();
+}
+
+function determine_if_guess_correct(digits)
+{
+    var guess_box = document.getElementById('guess_textbox');
+    var guess = guess_box.value;
+    if (guess == digits.toString())
+    {
+        alert('Correct! You score ' + score + 'points.');
+    }
+    else
+    {
+        score -= 1;
+    }
 }
 
