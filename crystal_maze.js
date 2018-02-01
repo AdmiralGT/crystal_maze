@@ -29,6 +29,7 @@ var button_grid_width = Math.floor(switchboard_width / (button_diameter));
 var segment_size = 5;
 var total_segments = 0;
 var total_segments_on = 0;
+var score = 0;
 
 // Function to turn all lights on the switchboard on
 function turn_all_lights_on()
@@ -195,6 +196,7 @@ function finish_game_setup(digits)
 {
     generate_digits(digits);
     create_reset_buttons();
+    score = 10;
 }
 
 // Function called when a button is pressed
@@ -317,7 +319,7 @@ function generate_buttons()
 {
     for (var ii = 0; ii < 32; ii++)
     {
-        //make_button("white", ii + 1, "black");
+        make_button("white", ii + 1, "black");
     }
     
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
@@ -466,21 +468,27 @@ function create_digit(digit)
 function generate_game()
 {
     size_objects();
-	//generate_switch_grid();
+	generate_switch_grid();
     generate_input_and_button();
 	generate_buttons();
 	generate_button_grid();
-	//loadjsondata('answer');
+	loadjsondata('answer');
 }
 
 function generate_input_and_button()
 {
     var gameboard = document.getElementById('gameboard');
     var div = document.createElement('div');
-    div.setAttribute('id', 'GRT');
+    div.setAttribute('id', 'guess_div');
     var input = document.createElement('input');
     input.type = 'text'
+    input.setAttribute('id', 'guess_textbox');
     div.appendChild(input);
+    var button = document.createElement('button');
+    button.innerHTML = "Guess";
+    button.setAttribute('onclick', 'guess()');
+    button.setAttribute('id', 'guess_button');
+    div.appendChild(button);
     gameboard.appendChild(div);
 }
 
@@ -530,17 +538,50 @@ function getButtonFromElementID(elementID)
     return button;
 }
 
+// Get answer
+function get_answer(url)
+{
+    var digit_request = new XMLHttpRequest();
+    digit_request.open("GET", url, true);
+    return digit_request;
+}
+
 // Makes a request to the server to get the code.
 function loadjsondata(url)
 {
     // first load the Ajax; load the pics file @@jquery this?
-    var digit_request = new XMLHttpRequest();
-    digit_request.open("GET", 'answer', true);
+    var digit_request = get_answer(url);
     digit_request.onload = function (e) {
         var json = eval('(' + digit_request.responseText + ')');
         var digits = json.data;
         finish_game_setup(digits.toString());
     };
     digit_request.send();
+}
+
+// Someone is attempting to guess the answer.
+function guess()
+{
+    var digit_request = get_answer('answer');
+    digit_request.onload = function (e) {
+        var json = eval('(' + digit_request.responseText + ')');
+        var digits = json.data;
+        determine_if_guess_correct(digits);
+    };
+    digit_request.send();
+}
+
+function determine_if_guess_correct(digits)
+{
+    var guess_box = document.getElementById('guess_textbox');
+    var guess = guess_box.value;
+    if (guess == digits.toString())
+    {
+        alert('Correct! You score ' + score + 'points.');
+    }
+    else
+    {
+        score -= 1;
+    }
 }
 
