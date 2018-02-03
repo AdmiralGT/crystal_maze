@@ -1,14 +1,15 @@
+// SVG Namespace
 var svgNS = "http://www.w3.org/2000/svg";
+
+// Variables for the total SVG area
+var svg_width = 1200;
+var svg_height = 675
 
 // Do not change the order of global_button_list
 var global_button_list = new Array();
 var global_button_locations = new Array();
 var global_digit_list = new Array();
 var digit_segment_list = new Array();
-
-// Variables for the total SVG area
-var svg_width = 1200;
-var svg_height = 675
 
 // Variables for the group of lights that turn off to reveal the code
 var lit = "#ffffcc";
@@ -58,7 +59,7 @@ function determine_next_segment(segments_on)
     return null;
 }
 
-// Turn off a specific segment
+// Turn off the lights for a specific segment
 function turn_off_segment(segment)
 {
     var digit_transform = transform_to_digit(segment.digit_pos);
@@ -200,17 +201,20 @@ function finish_game_setup(digits)
 }
 
 // Function called when a button is pressed
+// If this is a reset button, reset the light board, otherwise turn off the segment of lights.
 function button_press()
 {
     var button = getButtonFromElementID(this.event.target.id);
 
     if (button.reset)
     {
+        // Reset button
     	turn_all_lights_on();
         reset_game();
     }
     else if (button.clicked == false)
     {
+        // We've clicked a button not previously click. Turn off a segment (unless we've turned off all segments)
         if (total_segments_on < total_segments)
         {
             button.clicked = true;
@@ -322,6 +326,7 @@ function generate_buttons()
         make_button("white", ii + 1, "black");
     }
     
+    // Generate the locations for the buttons
 	for (var button_num = 0; button_num < global_button_list.length; button_num++)
 	{
         button_location = generate_button_location()
@@ -359,6 +364,8 @@ function determine_button_overlap(pos)
             }
         }
     }
+    
+    // Check the button doesn't overlap any other button
     for (var button_num = 0; button_num < global_button_locations.length; button_num++)
     {
         var button_location = global_button_locations[button_num];
@@ -402,6 +409,8 @@ function generate_digits(digit_string)
         }
         last_digit_segments.push(digit);
 	}
+    
+    // Randomize the order of segments and the last set of segments separately
     shuffle(digit_segment_list);
     shuffle(last_digit_segments);
 
@@ -475,6 +484,7 @@ function generate_game()
 	loadjsondata('answer');
 }
 
+// Function to generate the guess box and guess button.
 function generate_input_and_button()
 {
     var gameboard = document.getElementById('gameboard');
@@ -571,16 +581,18 @@ function guess()
     digit_request.send();
 }
 
+// Function to determine if a guess is correct
 function determine_if_guess_correct(digits)
 {
     var guess_box = document.getElementById('guess_textbox');
     var guess = guess_box.value;
     if (guess == digits.toString())
     {
-        alert('Correct! You score ' + score + 'points.');
+        alert('Correct! You score ' + Math.max(0, score) + 'points.');
     }
     else
     {
+        alert('Incorrect!');
         score -= 1;
     }
 }
