@@ -1,0 +1,6 @@
+slack_url: https://hooks.slack.com/services/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
+buttons:
+  - colour: red
+    text_colour: black
+    text: GREEN
+    url: https://i.imgur.com/3OJS3N3.jpg?1
