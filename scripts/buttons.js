@@ -2,7 +2,7 @@
 function make_button(colour, text, text_colour)
 {
     //var button = new Button(colour, text, text_colour, button_radius);
-    var button = new Button("white", text, "black", button_radius);
+    var button = new Button(colour, text, text_colour, button_radius);
     global_button_list.push(button);
 }
 

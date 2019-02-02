@@ -129,14 +129,16 @@ function generate_button_grid()
 }
 
 // Function that generates all our necessary buttons
-function generate_buttons()
+function generate_buttons(buttons)
 {
 	horizontal = Math.floor(svg_width / button_effective_diameter)
 	vertical = Math.floor(svg_height / button_effective_diameter)
 
-    for (var ii = 0; ii < (horizontal * vertical); ii++)
+	var json = JSON.parse(buttons)
+	for (var ii = 0; ii < json.length; ii++)
     {
-        make_button("white", ii + 1, "black");
+    	var button = json[ii]
+        make_button(button.colour, button.text, button.text_colour);
     }
     
     // Generate the locations for the buttons
@@ -145,6 +147,7 @@ function generate_buttons()
       button_location = generate_button_location(button_num, horizontal, vertical)
       global_button_locations.push(button_location);
     }
+	generate_button_grid();
 }
 
 // Function to generate a button location.
@@ -163,14 +166,12 @@ function generate_button_location(id, width, height)
 function generate_game()
 {
     size_objects();
-    generate_input_and_button();
-	generate_buttons();
-	generate_button_grid();
-	loadjsondata('answer');
+    get_buttons();
+    generate_objects();
 }
 
 // Function to generate the guess box and guess button.
-function generate_input_and_button()
+function generate_objects()
 {
     var gameboard = document.getElementById('gameboard');
     var div = document.createElement('div');
@@ -227,6 +228,17 @@ function getButtonFromElementID(elementID)
     var button = global_button_list[button_num];
 
     return button;
+}
+
+// Get button configuration
+function get_buttons()
+{
+	var button_request = new XMLHttpRequest();
+	button_request.open('GET', 'whosonfirst_buttons', true);
+	button_request.onload = function (e) {
+		generate_buttons(button_request.responseText)
+	}
+	button_request.send()
 }
 
 // Get answer
