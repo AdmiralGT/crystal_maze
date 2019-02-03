@@ -1,3 +1,20 @@
+// Get a Button Object from a HTTP Element ID
+function getButtonFromElementID(elementID)
+{
+    // Either the text or button was pressed, the last 9 characters is always
+    // the button's buttonID (button_XX).
+    var button_num_string = this.event.target.id.substr(this.event.target.id.length - 9);
+    for (var ii = 0; ii < global_button_list.length; ii++)
+    {
+    	var button = global_button_list[ii]
+    	if (button.button_id == button_num_string)
+    	{
+    		return button
+    	}
+    }
+    return
+}
+
 // Generate the grid of buttons that can be pressed to turn off lights or reset
 // the light board.
 function generate_button_grid()

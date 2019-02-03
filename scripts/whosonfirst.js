@@ -20,40 +20,51 @@ var button_separation = 2;
 var button_effective_diameter = button_diameter + button_separation;
 var score = 0;
 var rounds = 0;
+var game_in_progress = false;
 
 // Function called when a button is pressed
 // If this is a reset button, reset the light board, otherwise turn off the segment of lights.
 function button_press()
 {
-    var clicked_button = getButtonFromElementID(this.event.target.id);
+	// Don't do anything if the game is not in progress, it's just some buttons on a screen.
+	if (game_in_progress)
+	{
+	    var clicked_button = getButtonFromElementID(this.event.target.id);
 
-    if (clicked_button.target)
-    {
-    	score += 1
-    }
+	    if (clicked_button.target)
+	    {
+	    	score += 1
+	    	alert("Correct")
+	    }
+	    else
+	    {
+	    	alert("Wrong")
+	    }
 
-    // We don't know which button is the current target so just set them all not to be the target
-    for (var ii = 0; ii < global_button_list.length; ii++)
-    {
-    	var button = global_button_list[ii]
-    	button.setTarget(false)
-    }
+	    // We don't know which button is the current target so just set them all not to be the target
+	    for (var ii = 0; ii < global_button_list.length; ii++)
+	    {
+	    	var button = global_button_list[ii]
+	    	button.setTarget(false)
+	    }
 
-    if (global_button_targets.length > 0)
-    {
-	    set_next_target(global_button_targets.pop())
-    }
-    else
-    {
-    	alert(score)
-    }
+	    if (global_button_targets.length > 0)
+	    {
+		    set_next_target(global_button_targets.pop())
+	    }
+	    else
+	    {
+	    	game_in_progress = false;
+	    	alert(score)
+	    }
+	}
 }
 
 // Function to get the next target button and send the image to slack
 function set_next_target(button)
 {
     button.setTarget(true)
-    send_message_to_server("post_slack_message?imageurl="+button.imageurl);
+    send_message_to_server("post_slack_message?imageurl=\""+button.imageurl) + "\"";
 }
 
 // Function that receives game configuration
@@ -146,9 +157,10 @@ function get_game_config()
 function start_game()
 {
 	score = 0;
+	game_in_progress = true;
 	shuffle(global_button_list)
-    target_button_list = global_button_list.slice(0, rounds)
-    set_next_target(target_button_list.pop())
+    global_button_targets = global_button_list.slice(0, rounds)
+    set_next_target(global_button_targets.pop())
 }
 
 function reset_game()

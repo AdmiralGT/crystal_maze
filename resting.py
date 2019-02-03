@@ -20,10 +20,10 @@ class Crystal_Maze(object):
         return json.dumps(self.config)
 
     @cherrypy.expose
-    def post_slack_message(self, image='null'):
-        attachment = {'image_url': image, 'text': 'Test'}
+    def post_slack_message(self, imageurl='null'):
+        attachment = {'image_url': imageurl, 'text': 'Test'}
         data = {'attachments': [attachment]}
-        r = requests.post(self.config['slack_url'], json=data)
+        # r = requests.post(self.config['slack_url'], json=data)
         return
 
     @cherrypy.expose

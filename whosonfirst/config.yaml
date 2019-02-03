@@ -25,11 +25,7 @@ buttons:
     text_colour: white
     text: GREEN
     url: https://i.imgur.com/3OJS3N3.jpg?1
-  - colour: black
-    text_colour: white
-    text: GREEN
-    url: https://i.imgur.com/3OJS3N3.jpg?1
-  - colour: black
-    text_colour: white
+  - colour: white
+    text_colour: black
     text: GREEN
     url: https://i.imgur.com/3OJS3N3.jpg?1
