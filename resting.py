@@ -30,6 +30,7 @@ class Crystal_Maze(object):
     @cherrypy.expose
     def reload_config(self):
         self.config = yaml.safe_load(self.config_file)
+        return
 
 
 if __name__ == '__main__':
