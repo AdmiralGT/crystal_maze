@@ -19,32 +19,53 @@ var button_diameter = 2 * button_radius;
 var button_separation = 2;
 var button_effective_diameter = button_diameter + button_separation;
 var score = 0;
+var rounds = 0;
 
 // Function called when a button is pressed
 // If this is a reset button, reset the light board, otherwise turn off the segment of lights.
 function button_press()
 {
-    var button = getButtonFromElementID(this.event.target.id);
+    var clicked_button = getButtonFromElementID(this.event.target.id);
 
-    if (button.target)
+    if (clicked_button.target)
     {
     	score += 1
     }
 
-    // Send next target
-	send_message_to_server("post_slack_message")
+    // We don't know which button is the current target so just set them all not to be the target
+    for (var ii = 0; ii < global_button_list.length; ii++)
+    {
+    	var button = global_button_list[ii]
+    	button.setTarget(false)
+    }
 
+    if (global_button_targets.length > 0)
+    {
+	    set_next_target(global_button_targets.pop())
+    }
+    else
+    {
+    	alert(score)
+    }
+}
+
+// Function to get the next target button and send the image to slack
+function set_next_target(button)
+{
+    button.setTarget(true)
+    send_message_to_server("post_slack_message?imageurl="+button.imageurl);
 }
 
 // Function that receives game configuration
 function receive_game_config(config)
 {
 	var json = JSON.parse(config)
-	generate_buttons(json['buttons'], json['rounds'])
+	generate_buttons(json['buttons'])
+	rounds = json['rounds']
 }
 
 // Function that generates all our necessary buttons
-function generate_buttons(buttons, rounds)
+function generate_buttons(buttons)
 {
 	horizontal = Math.floor(svg_width / button_effective_diameter)
 	vertical = Math.floor(svg_height / button_effective_diameter)
@@ -52,13 +73,12 @@ function generate_buttons(buttons, rounds)
 	for (var ii = 0; ii < buttons.length; ii++)
     {
     	var button = buttons[ii]
-        make_button(button.colour, button.text, button.text_colour);
+        make_button(button.colour, button.text, button.text_colour, button.url);
     }
 
     // We can only display a certain number of buttons so slice the list at the max size
     shuffle(global_button_list)
     global_button_list = global_button_list.slice(0, horizontal * vertical)
-    target_button_list = global_button_list.slice(0, rounds)
     
     // Generate the locations for the buttons
     for (var button_num = 0; button_num < global_button_list.length; button_num++)
@@ -125,7 +145,10 @@ function get_game_config()
 // Someone is attempting to guess the answer.
 function start_game()
 {
-	send_message_to_server("post_slack_message")
+	score = 0;
+	shuffle(global_button_list)
+    target_button_list = global_button_list.slice(0, rounds)
+    set_next_target(target_button_list.pop())
 }
 
 function reset_game()
@@ -140,3 +163,13 @@ function send_message_to_server(url)
 	slack_request.open("GET", url, true);
 	slack_request.send()
 }
+
+// Function to build a button and put it in the global list of buttons.
+function make_button(colour, text, text_colour, url)
+{
+    //var button = new Button(colour, text, text_colour, button_radius);
+    var button = new Button(colour, text, text_colour, button_radius)
+    button.setImageURL(url)
+    global_button_list.push(button)
+}
+

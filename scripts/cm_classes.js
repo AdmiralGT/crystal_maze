@@ -11,6 +11,7 @@ function Button(colour, text, text_colour, radius)
 	this.reset = false;
     this.clicked = false;
     this.target = false;
+    this.imageurl = ''
 
 	this.setLocation = function(buttonLocation)
 	{
@@ -35,6 +36,11 @@ function Button(colour, text, text_colour, radius)
     this.setTarget = function(target)
     {
     	this.target = target
+    }
+
+    this.setImageURL = function(url)
+    {
+    	this.imageurl = url
     }
 }
 
