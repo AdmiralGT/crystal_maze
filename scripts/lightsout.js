@@ -418,12 +418,13 @@ function create_digit(digit)
 // Used on page load to generate the light grid and buttons that will be in game
 function generate_game()
 {
-    size_game_board("svg_area", svg_width, svg_height);
-	generate_switch_grid();
-    generate_input_and_button();
-	generate_buttons();
-	generate_button_grid();
-	loadjsondata('answer');
+    size_game_board("svg_area", svg_width, svg_height)
+	generate_switch_grid()
+    generate_input_and_button()
+	generate_buttons()
+	generate_button_grid(global_button_list)
+    set_button_locations(global_button_list)
+	loadjsondata('answer')
 }
 
 // Function to generate the guess box and guess button.

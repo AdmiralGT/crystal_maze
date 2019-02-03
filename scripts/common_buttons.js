@@ -17,7 +17,7 @@ function getButtonFromElementID(elementID)
 
 // Generate the grid of buttons that can be pressed to turn off lights or reset
 // the light board.
-function generate_button_grid()
+function generate_button_grid(button_list)
 {
 	// All buttons have the same border for now...
 	var stroke = "black";
@@ -26,7 +26,7 @@ function generate_button_grid()
 	// Generate the general SVG area to put buttons in.
 	var switch_svg = document.getElementById("svg_area");
 
-	for (var button_num = 0; button_num < global_button_list.length; button_num++)
+	for (var button_num = 0; button_num < button_list.length; button_num++)
 	{
 		// Get the Button Object from our global list and generate a element name for this Button.
 		var button = global_button_list[button_num];
@@ -50,28 +50,26 @@ function generate_button_grid()
 		// Put the Button element in the group.
 		g.appendChild(button_element);
 
-		var text = document.createElementNS(svgNS, "text");
+		var text_element = document.createElementNS(svgNS, "text");
 		var text_id = "text_for_" + button_id;
 		button.setTextID(text_id);
-		text.setAttributeNS(null, 'id', text_id);
-		text.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: 2em; dominant-baseline: middle');
-		text.setAttributeNS(null, 'text-anchor', 'middle');
-		text.setAttributeNS(null, 'onmousedown', 'button_press()');
+		text_element.setAttributeNS(null, 'id', text_id);
+		text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: 2em; dominant-baseline: middle');
+		text_element.setAttributeNS(null, 'text-anchor', 'middle');
+		text_element.setAttributeNS(null, 'onmousedown', 'button_press()');
 		var text_node = document.createTextNode(button.text);
-		text.appendChild(text_node);
-		g.appendChild(text);
-
+		text_element.appendChild(text_node);
+		g.appendChild(text_element);
 	}
-	set_button_locations();
 }
 
 // Shuffle the order of buttons around on the display.
-function set_button_locations()
+function set_button_locations(button_list)
 {
     // Update the button location of each button
-	for (var button_num = 0; button_num < global_button_list.length; button_num++)
+	for (var button_num = 0; button_num < button_list.length; button_num++)
 	{
-		var button = global_button_list[button_num];
+		var button = button_list[button_num];
 		button.setLocation(global_button_locations[button_num]);
 		redraw_button(button);
 	}

@@ -5,11 +5,15 @@ var svgNS = "http://www.w3.org/2000/svg";
 var svg_width = 1200;
 var svg_height = 675
 
-// Do not change the order of global_button_list
+// A list of all the buttons and all the locations
 var global_button_list = new Array();
-var target_button_list = new Array();
 var global_button_locations = new Array();
-var global_button_targets = new Array();
+
+// A list of buttons that are the targets this game
+var target_button_list = new Array();
+
+// A list of the buttons in this game
+var game_button_list = new Array();
 
 // Variables for the buttons that can be pressed
 //var button_pressed = "#ffe6e6"; // This possibly makes it too easy
@@ -48,9 +52,9 @@ function button_press()
 	    	button.setTarget(false)
 	    }
 
-	    if (global_button_targets.length > 0)
+	    if (target_button_list.length > 0)
 	    {
-		    set_next_target(global_button_targets.pop())
+		    set_next_target(target_button_list.pop())
 	    }
 	    else
 	    {
@@ -87,17 +91,12 @@ function generate_buttons(buttons)
         make_button(button.colour, button.text, button.text_colour, button.url);
     }
 
-    // We can only display a certain number of buttons so slice the list at the max size
-    shuffle(global_button_list)
-    global_button_list = global_button_list.slice(0, horizontal * vertical)
-    
     // Generate the locations for the buttons
-    for (var button_num = 0; button_num < global_button_list.length; button_num++)
+    for (var button_num = 0; button_num < buttons.length; button_num++)
     {
       button_location = generate_button_location(button_num, horizontal, vertical)
       global_button_locations.push(button_location);
     }
-	generate_button_grid();
 }
 
 // Function to generate a button location.
@@ -156,15 +155,29 @@ function get_game_config()
 // Someone is attempting to guess the answer.
 function start_game()
 {
-	score = 0;
-	game_in_progress = true;
-	shuffle(global_button_list)
-    global_button_targets = global_button_list.slice(0, rounds)
-    set_next_target(global_button_targets.pop())
+	if (!game_in_progress)
+	{
+		score = 0;
+		game_in_progress = true;
+	
+	    // We can only display a certain number of buttons so slice the list at the max size
+	    shuffle(global_button_list)
+	    game_button_list = global_button_list.slice(0, horizontal * vertical)
+		generate_button_grid(game_button_list)
+	    set_button_locations(game_button_list)
+	    target_button_list = game_button_list.slice(0, rounds)
+	    set_next_target(target_button_list.pop())
+	}
 }
 
 function reset_game()
 {
+	var svg_area = document.getElementById("svg_area")
+	while (svg_area.firstChild)
+	{
+		svg_area.firstChild.remove()
+	}
+	game_in_progress = false
 	send_message_to_server("reload_config")
 }
 
