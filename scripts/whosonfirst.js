@@ -8,8 +8,6 @@ var svg_height = 675
 // Do not change the order of global_button_list
 var global_button_list = new Array();
 var global_button_locations = new Array();
-var global_digit_list = new Array();
-var digit_segment_list = new Array();
 
 // Variables for the buttons that can be pressed
 //var button_pressed = "#ffe6e6"; // This possibly makes it too easy
@@ -18,21 +16,12 @@ var button_radius = 50;
 var button_diameter = 2 * button_radius;
 var button_separation = 2;
 var button_effective_diameter = button_diameter + button_separation;
-var segment_size = 5;
-var total_segments = 0;
-var total_segments_on = 0;
 var score = 0;
+var rounds = 0;
 
 // Reset the game state
 function reset_game()
 {
-    // Reset the list of active segments on each digit
-    for (var ii = 0; ii < global_digit_list.length; ii++)
-    {
-        global_digit_list[ii].active_segments = 0;
-    }
-    total_segments_on = 0;
-
     // Reset the state of every button
     for (var button_num = 0; button_num < global_button_list.length; button_num++)
     {
@@ -57,21 +46,12 @@ function button_press()
     if (button.reset)
     {
         // Reset button
-    	turn_all_lights_on();
         reset_game();
     }
     else if (button.clicked == false)
     {
         // We've clicked a button not previously click. Turn off a segment (unless we've turned off all segments)
-        if (total_segments_on < total_segments)
-        {
-            button.clicked = true;
-            var segment = determine_next_segment(total_segments_on);
-            turn_off_segment(segment);
-            total_segments_on++;
-            global_digit_list[segment.digit_pos].active_segments++;
-            $("#" + button.button_id).attr('fill', button_pressed);
-        }
+        button.clicked = true;
     }
 
 }
@@ -128,16 +108,23 @@ function generate_button_grid()
 	randomise_buttons();
 }
 
+// Function that receives game configuration
+function receive_game_config(config)
+{
+	var json = JSON.parse(config)
+	generate_buttons(json['buttons'])
+	rounds = json['rounds']
+}
+
 // Function that generates all our necessary buttons
 function generate_buttons(buttons)
 {
 	horizontal = Math.floor(svg_width / button_effective_diameter)
 	vertical = Math.floor(svg_height / button_effective_diameter)
 
-	var json = JSON.parse(buttons)
-	for (var ii = 0; ii < json.length; ii++)
+	for (var ii = 0; ii < buttons.length; ii++)
     {
-    	var button = json[ii]
+    	var button = buttons[ii]
         make_button(button.colour, button.text, button.text_colour);
     }
     
@@ -166,7 +153,7 @@ function generate_button_location(id, width, height)
 function generate_game()
 {
     size_objects();
-    get_buttons();
+    get_game_config();
     generate_objects();
 }
 
@@ -230,37 +217,18 @@ function getButtonFromElementID(elementID)
     return button;
 }
 
-// Get button configuration
-function get_buttons()
+// Get game configuration
+function get_game_config()
 {
 	var button_request = new XMLHttpRequest();
 	button_request.open('GET', 'whosonfirst_buttons', true);
 	button_request.onload = function (e) {
-		generate_buttons(button_request.responseText)
+		receive_game_config(button_request.responseText)
 	}
 	button_request.send()
 }
 
-// Get answer
-function get_answer(url)
-{
-    var digit_request = new XMLHttpRequest();
-    digit_request.open("GET", url, true);
-    return digit_request;
-}
-
-// Makes a request to the server to get the code.
-function loadjsondata(url)
-{
-    // first load the Ajax; load the pics file @@jquery this?
-    var digit_request = get_answer(url);
-    digit_request.onload = function (e) {
-        var json = eval('(' + digit_request.responseText + ')');
-        var digits = json.data;
-        finish_game_setup(digits.toString());
-    };
-    digit_request.send();
-}
+// 
 
 // Someone is attempting to guess the answer.
 function start()
@@ -275,20 +243,3 @@ function send_button_to_slack()
 	slack_request.open("GET", "post_slack_message", true);
 	slack_request.send()
 }
-
-// Function to determine if a guess is correct
-function determine_if_guess_correct(digits)
-{
-    var guess_box = document.getElementById('guess_textbox');
-    var guess = guess_box.value;
-    if (guess == digits.toString())
-    {
-        alert('Correct! You score ' + Math.max(0, score) + 'points.');
-    }
-    else
-    {
-        alert('Incorrect!');
-        score -= 1;
-    }
-}
-

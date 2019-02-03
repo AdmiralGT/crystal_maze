@@ -8,8 +8,8 @@ class Crystal_Maze(object):
 
     def __init__(self, config_file):
         with open(config_file) as config:
-            self.config_file = config_file
-            self.config = yaml.safe_load(config_file)
+            self.config_file = config
+            self.config = yaml.safe_load(config)
         return
         
     @cherrypy.expose
@@ -18,17 +18,14 @@ class Crystal_Maze(object):
 
     @cherrypy.expose
     def whosonfirst_buttons(self):
-        return json.dumps(self.config['buttons'])
+        return json.dumps(self.config)
 
     @cherrypy.expose
     def post_slack_message(self):
-        print(self.config)
         attachment = {'image_url': 'https://i.imgur.com/3OJS3N3.jpg?1', 'text': 'Test'}
         data = {'attachments': [attachment]}
         r = requests.post(self.config['slack_url'], json=data)
-        print(r.text)
-        print(r.status_code)
-        return 'OK'
+        return
 
     @cherrypy.expose
     def reload_config(self):
