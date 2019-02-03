@@ -10,6 +10,7 @@ function Button(colour, text, text_colour, radius)
 	this.text_id = null;
 	this.reset = false;
     this.clicked = false;
+    this.target = false;
 
 	this.setLocation = function(buttonLocation)
 	{
@@ -29,6 +30,11 @@ function Button(colour, text, text_colour, radius)
     this.setReset = function(reset)
     {
         this.reset = reset;
+    }
+
+    this.setTarget = function(target)
+    {
+    	this.target = target
     }
 }
 
