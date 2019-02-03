@@ -20,18 +20,6 @@ var button_separation = 2;
 var button_effective_diameter = button_diameter + button_separation;
 var score = 0;
 
-// Reset the game state
-function reset_game()
-{
-    // Reset the state of every button
-    for (var button_num = 0; button_num < global_button_list.length; button_num++)
-    {
-		var button = global_button_list[button_num];
-        button.clicked = false;
-        $("#" + button.button_id).attr('fill', button.colour);
-    }
-}
-
 // Function called when a button is pressed
 // If this is a reset button, reset the light board, otherwise turn off the segment of lights.
 function button_press()
@@ -108,7 +96,6 @@ function generate_objects()
     var div = document.createElement('div');
     div.setAttribute('id', 'guess_div');
 
-
     var start_button = document.createElement('button');
     start_button.innerHTML = "Start";
     start_button.setAttribute('onclick', 'start_game()');
@@ -124,18 +111,6 @@ function generate_objects()
     gameboard.appendChild(div);
 }
 
-// Get a Button Object from a HTTP Element ID
-function getButtonFromElementID(elementID)
-{
-    // Either the text or button was pressed, the last 8 characters is always
-    // the button's buttonID.
-    var button_num_string = this.event.target.id.substr(this.event.target.id.length - 2);
-    var button_num = parseInt(button_num_string, 10);
-    var button = global_button_list[button_num];
-
-    return button;
-}
-
 // Get game configuration
 function get_game_config()
 {
@@ -146,8 +121,6 @@ function get_game_config()
 	}
 	button_request.send()
 }
-
-// 
 
 // Someone is attempting to guess the answer.
 function start_game()

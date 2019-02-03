@@ -444,18 +444,6 @@ function generate_input_and_button()
     gameboard.appendChild(div);
 }
 
-// Get a Button Object from a HTTP Element ID
-function getButtonFromElementID(elementID)
-{
-    // Either the text or button was pressed, the last 8 characters is always
-    // the button's buttonID.
-    var button_num_string = this.event.target.id.substr(this.event.target.id.length - 2);
-    var button_num = parseInt(button_num_string, 10);
-    var button = global_button_list[button_num];
-
-    return button;
-}
-
 // Get answer
 function get_answer(url)
 {
