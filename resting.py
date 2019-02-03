@@ -7,9 +7,8 @@ import json
 class Crystal_Maze(object):
 
     def __init__(self, config_file):
-        with open(config_file) as config:
-            self.config_file = config
-            self.config = yaml.safe_load(config)
+        self.config_file = config_file
+        self.load_config(self.config_file)
         return
         
     @cherrypy.expose
@@ -29,8 +28,13 @@ class Crystal_Maze(object):
 
     @cherrypy.expose
     def reload_config(self):
-        self.config = yaml.safe_load(self.config_file)
+        self.load_config(self.config_file)
         return
+
+    def load_config(self, config_file):
+        with open(config_file) as config:
+            self.config = yaml.safe_load(config)
+
 
 
 if __name__ == '__main__':

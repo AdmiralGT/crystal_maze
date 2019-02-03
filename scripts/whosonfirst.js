@@ -163,11 +163,20 @@ function generate_objects()
     var gameboard = document.getElementById('gameboard');
     var div = document.createElement('div');
     div.setAttribute('id', 'guess_div');
-    var button = document.createElement('button');
-    button.innerHTML = "Start";
-    button.setAttribute('onclick', 'start()');
-    button.setAttribute('id', 'start_button');
-    div.appendChild(button);
+
+
+    var start_button = document.createElement('button');
+    start_button.innerHTML = "Start";
+    start_button.setAttribute('onclick', 'start_game()');
+    start_button.setAttribute('id', 'start_button');
+    div.appendChild(start_button);
+
+    var reset_button = document.createElement('button');
+    reset_button.innerHTML = "Reset";
+    reset_button.setAttribute('onclick', 'reset_game()');
+    reset_button.setAttribute('id', 'reset_button');
+    div.appendChild(reset_button);
+
     gameboard.appendChild(div);
 }
 
@@ -231,15 +240,20 @@ function get_game_config()
 // 
 
 // Someone is attempting to guess the answer.
-function start()
+function start_game()
 {
-	send_button_to_slack()
+	send_message_to_server("post_slack_message")
+}
+
+function reset_game()
+{
+	send_message_to_server("reload_config")
 }
 
 // Sends a picture of the button to slack
-function send_button_to_slack()
+function send_message_to_server(url)
 {
 	var slack_request = new XMLHttpRequest();
-	slack_request.open("GET", "post_slack_message", true);
+	slack_request.open("GET", url, true);
 	slack_request.send()
 }
