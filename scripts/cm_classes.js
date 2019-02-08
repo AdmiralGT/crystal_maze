@@ -12,7 +12,7 @@ function Button(colour, text, text_colour, radius)
     this.clicked = false;
     this.target = false;
     this.imageurl = '';
-    this.text_size = 24;
+    this.text_size = 26;
 
 	this.setLocation = function(buttonLocation)
 	{

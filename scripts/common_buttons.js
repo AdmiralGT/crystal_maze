@@ -50,6 +50,7 @@ function generate_button_grid(button_list)
 		// Put the Button element in the group.
 		g.appendChild(button_element);
 
+		button.text_id.length = 0
 		for (var ii = 0; ii < button.text.length; ii++)
 		{
 			var text_element = document.createElementNS(svgNS, "text");
@@ -84,10 +85,20 @@ function redraw_button(button)
 	var button_element = document.getElementById(button.button_id);
 	button_element.setAttribute('cx', button.location.x);
 	button_element.setAttribute('cy', button.location.y);
+
+	vertical_offset = (button.text_size * button.text_id.length) / 2
+	y_pos = button.location.y - vertical_offset
 	for (var ii = 0; ii < button.text_id.length; ii++)
 	{
 		var text_element = document.getElementById(button.text_id[ii]);
 		text_element.setAttribute('x', button.location.x);
-		text_element.setAttribute('y', button.location.y);
+		text_element.setAttribute('y', y_pos + text_vertical_offset(button.text_size, ii));
 	}
+}
+
+// Function that works out where to put each text box vertically
+function text_vertical_offset(text_size, id)
+{
+	return (text_size / 2) + (id * text_size)
+
 }
