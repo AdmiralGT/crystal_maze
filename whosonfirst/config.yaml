@@ -1,31 +1,46 @@
 slack_url: https://hooks.slack.com/services/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
 rounds: 10
+gamelength: 0
 buttons:
   - colour: red
     text_colour: black
     text: GREEN
-    url: https://i.imgur.com/3OJS3N3.jpg?1
+    text_size: 16
+    url: https://i.imgur.com/JMy9n3p.jpg?1
   - colour: green
     text_colour: black
     text: GREEN
-    url: https://i.imgur.com/3OJS3N3.jpg?1
+    text_size: 16
+    url: https://i.imgur.com/KSZ55Tw.jpg?1
   - colour: blue
     text_colour: black
     text: GREEN
-    url: https://i.imgur.com/3OJS3N3.jpg?1
+    text_size: 16
+    url: https://i.imgur.com/m8sTf6Y.jpg?1
   - colour: yellow
     text_colour: black
     text: GREEN
-    url: https://i.imgur.com/3OJS3N3.jpg?1
+    text_size: 16
+    url: https://i.imgur.com/LKxYXbV.jpg?1
   - colour: orange
     text_colour: black
     text: GREEN
-    url: https://i.imgur.com/3OJS3N3.jpg?1
+    text_size: 16
+    url: https://i.imgur.com/mjcoh5t.jpg?2
   - colour: black
     text_colour: white
     text: GREEN
-    url: https://i.imgur.com/3OJS3N3.jpg?1
+    text_size: 16
+    url: https://i.imgur.com/bj7SEpK.jpg?1
   - colour: white
     text_colour: black
     text: GREEN
+    text_size: 16
+    url: https://i.imgur.com/3OJS3N3.jpg?1
+  - colour: white
+    text_colour: black
+    text: 
+      - GREEN
+      - TEST
+    text_size: 16
     url: https://i.imgur.com/3OJS3N3.jpg?1

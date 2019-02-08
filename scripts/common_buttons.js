@@ -50,16 +50,19 @@ function generate_button_grid(button_list)
 		// Put the Button element in the group.
 		g.appendChild(button_element);
 
-		var text_element = document.createElementNS(svgNS, "text");
-		var text_id = "text_for_" + button_id;
-		button.setTextID(text_id);
-		text_element.setAttributeNS(null, 'id', text_id);
-		text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: 2em; dominant-baseline: middle');
-		text_element.setAttributeNS(null, 'text-anchor', 'middle');
-		text_element.setAttributeNS(null, 'onmousedown', 'button_press()');
-		var text_node = document.createTextNode(button.text);
-		text_element.appendChild(text_node);
-		g.appendChild(text_element);
+		for (var ii = 0; ii < button.text.length; ii++)
+		{
+			var text_element = document.createElementNS(svgNS, "text");
+			var text_id = "text_" + ii + "_for_" + button_id;
+			button.addTextID(text_id);
+			text_element.setAttributeNS(null, 'id', text_id);
+			text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+			text_element.setAttributeNS(null, 'text-anchor', 'middle');
+			text_element.setAttributeNS(null, 'onmousedown', 'button_press()');
+			var text_node = document.createTextNode(button.text[ii]);
+			text_element.appendChild(text_node);
+			g.appendChild(text_element);
+		}
 	}
 }
 
@@ -81,7 +84,10 @@ function redraw_button(button)
 	var button_element = document.getElementById(button.button_id);
 	button_element.setAttribute('cx', button.location.x);
 	button_element.setAttribute('cy', button.location.y);
-	var text_element = document.getElementById(button.text_id);
-	text_element.setAttribute('x', button.location.x);
-	text_element.setAttribute('y', button.location.y);
+	for (var ii = 0; ii < button.text_id.length; ii++)
+	{
+		var text_element = document.getElementById(button.text_id[ii]);
+		text_element.setAttribute('x', button.location.x);
+		text_element.setAttribute('y', button.location.y);
+	}
 }

@@ -7,11 +7,12 @@ function Button(colour, text, text_colour, radius)
 	this.radius = radius;
 	this.location = null;
 	this.button_id = null;
-	this.text_id = null;
+	this.text_id = new Array();
 	this.reset = false;
     this.clicked = false;
     this.target = false;
-    this.imageurl = ''
+    this.imageurl = '';
+    this.text_size = 24;
 
 	this.setLocation = function(buttonLocation)
 	{
@@ -23,9 +24,14 @@ function Button(colour, text, text_colour, radius)
 		this.button_id = buttonID;
 	}
 
-	this.setTextID = function(textID)
+	this.addTextID = function(textID)
 	{
-		this.text_id = textID;
+		this.text_id.push(textID);
+	}
+
+	this.setTextSize = function(text_size)
+	{
+		this.text_size = text_size;
 	}
     
     this.setReset = function(reset)

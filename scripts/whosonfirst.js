@@ -16,7 +16,6 @@ var target_button_list = new Array();
 var game_button_list = new Array();
 
 // Variables for the buttons that can be pressed
-//var button_pressed = "#ffe6e6"; // This possibly makes it too easy
 var button_pressed = "white";
 var button_radius = 50;
 var button_diameter = 2 * button_radius;
@@ -25,6 +24,10 @@ var button_effective_diameter = button_diameter + button_separation;
 var score = 0;
 var rounds = 0;
 var game_in_progress = false;
+
+// Variable to track the timer.
+var game_end_timer;
+var game_length = -1;
 
 // Function called when a button is pressed
 // If this is a reset button, reset the light board, otherwise turn off the segment of lights.
@@ -58,17 +61,26 @@ function button_press()
 	    }
 	    else
 	    {
-	    	game_in_progress = false;
-	    	alert(score)
+	    	end_game()
 	    }
 	}
 }
+
+// Function to end the game and print the score
+function end_game()
+{
+	clearTimeout(game_end_timer)
+   	game_in_progress = false
+   	alert("Score: " + score)
+   	reset_game()
+}
+
 
 // Function to get the next target button and send the image to slack
 function set_next_target(button)
 {
     button.setTarget(true)
-    send_message_to_server("post_slack_message?imageurl=\""+button.imageurl) + "\"";
+    send_message_to_server("post_slack_message?imageurl=" + button.imageurl);
 }
 
 // Function that receives game configuration
@@ -77,6 +89,7 @@ function receive_game_config(config)
 	var json = JSON.parse(config)
 	generate_buttons(json['buttons'])
 	rounds = json['rounds']
+	game_length = json['gamelength']
 }
 
 // Function that generates all our necessary buttons
@@ -88,7 +101,11 @@ function generate_buttons(buttons)
 	for (var ii = 0; ii < buttons.length; ii++)
     {
     	var button = buttons[ii]
-        make_button(button.colour, button.text, button.text_colour, button.url);
+    	if (!Array.isArray(button.text))
+    	{
+    		button.text = [button.text]
+    	}
+        make_button(button);
     }
 
     // Generate the locations for the buttons
@@ -167,6 +184,11 @@ function start_game()
 	    set_button_locations(game_button_list)
 	    target_button_list = game_button_list.slice(0, rounds)
 	    set_next_target(target_button_list.pop())
+
+	    if (game_length > 0)
+	    {
+		    game_end_timer = setTimeout(end_game, game_length * 1000)
+	    }
 	}
 }
 
@@ -190,11 +212,12 @@ function send_message_to_server(url)
 }
 
 // Function to build a button and put it in the global list of buttons.
-function make_button(colour, text, text_colour, url)
+function make_button(button_json)
 {
     //var button = new Button(colour, text, text_colour, button_radius);
-    var button = new Button(colour, text, text_colour, button_radius)
-    button.setImageURL(url)
+    var button = new Button(button_json.colour, button_json.text, button_json.text_colour, button_radius)
+    button.setTextSize(button_json.text_size)
+    button.setImageURL(button_json.url)
     global_button_list.push(button)
 }
 
