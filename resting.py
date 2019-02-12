@@ -35,7 +35,15 @@ class Crystal_Maze(object):
         with open(config_file) as config:
             self.config = yaml.safe_load(config)
 
-
+    @cherrypy.expose
+    def describe_button(self, description="", button_colour="Unknown", text_colour="Unknown", button_text="Unknown"):
+        with open('descriptions.txt', 'a+') as descriptions:
+            descriptions.write("Button Colour: " + button_colour + ", Text Colour: " + text_colour + "\n")
+            descriptions.write("Button Text:\n")
+            descriptions.write(button_text + "\n")
+            descriptions.write("Description: ")
+            descriptions.write(description)
+            descriptions.write('\n')
 
 if __name__ == '__main__':
     conf = \

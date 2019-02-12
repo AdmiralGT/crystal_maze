@@ -201,6 +201,10 @@ function reset_game()
 	}
 	game_in_progress = false
 	send_message_to_server("reload_config")
+	global_button_list.length = 0
+	global_button_locations.length = 0
+	game_button_list.length = 0
+	get_game_config()
 }
 
 // Sends a picture of the button to slack
@@ -216,8 +220,22 @@ function make_button(button_json)
 {
     //var button = new Button(colour, text, text_colour, button_radius);
     var button = new Button(button_json.colour, button_json.text, button_json.text_colour, button_radius)
-    button.setTextSize(button_json.text_size)
-    button.setImageURL(button_json.url)
+    if (button_json.text_size)
+    {
+	    button.setTextSize(button_json.text_size)
+    }
+    else
+    {
+    	button.setTextSize(16)
+    }
+    if (button_json.url)
+    {
+	    button.setImageURL(button_json.url)
+    }
+    else
+    {
+    	button.setImageURL('https://i.imgur.com/JMy9n3p.jpg?1')
+    }
     global_button_list.push(button)
 }
 

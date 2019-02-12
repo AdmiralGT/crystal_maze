@@ -22,13 +22,6 @@ var button_separation = 2;
 var button_effective_diameter = button_diameter + button_separation;
 
 
-// Function to get the next target button and send the image to slack
-function set_next_target(button)
-{
-    button.setTarget(true)
-    send_message_to_server("post_slack_message?imageurl=" + button.imageurl);
-}
-
 // Function that receives game configuration
 function receive_game_config(config)
 {
@@ -101,18 +94,57 @@ function generate_objects()
     enter_button.setAttribute('id', 'enter_button');
     div.appendChild(enter_button);
 
+    var reload_button = document.createElement('button');
+    reload_button.innerHTML = "Reload Buttons";
+    reload_button.setAttribute('onclick', 'reset_game()');
+    reload_button.setAttribute('id', 'reload_button');
+    div.appendChild(reload_button);
+
     gameboard.appendChild(div);
+}
+
+function reset_game()
+{
+	clear_display()
+	global_button_list.length = 0
+	global_button_locations.length = 0
+	game_button_list.length = 0	
+	send_message_to_server('reload_config')
+	get_game_config()
 }
 
 // All buttons have a press function. Don't do anything if they press the button
 function button_press()
 {
+	display_new_button()
 	return
 }
 
+// What to do when we press the enter button
 function enter_description()
 {
+	
+	display_new_button()
+	var description = $("#guess_textbox").val()
+	var button = game_button_list[0]
+	var url = "describe_button?button_colour=" + button.colour + "&text_colour=" + button.text_colour + "&button_text=" + button.text + "&description=" + description
+	send_message_to_server(url)
 	return
+}
+
+function display_new_button()
+{
+	clear_display()
+	display_button()
+}
+
+function clear_display()
+{
+	var svg_area = document.getElementById("svg_area")
+	while (svg_area.firstChild)
+	{
+		svg_area.firstChild.remove()
+	}
 }
 
 // Get game configuration
@@ -124,18 +156,6 @@ function get_game_config()
 		receive_game_config(button_request.responseText)
 	}
 	button_request.send()
-}
-
-
-function reset_game()
-{
-	var svg_area = document.getElementById("svg_area")
-	while (svg_area.firstChild)
-	{
-		svg_area.firstChild.remove()
-	}
-	game_in_progress = false
-	send_message_to_server("reload_config")
 }
 
 // Sends a picture of the button to slack
@@ -151,7 +171,7 @@ function make_button(button_json)
 {
     //var button = new Button(colour, text, text_colour, button_radius);
     var button = new Button(button_json.colour, button_json.text, button_json.text_colour, button_radius)
-    button.setTextSize(80)
+    button.setTextSize(50)
     global_button_list.push(button)
 }
 
