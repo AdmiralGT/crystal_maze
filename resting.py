@@ -49,6 +49,6 @@ if __name__ == '__main__':
     cherrypy.config.update({'server.socket_host': '0.0.0.0'})
     cherrypy.config.update({'server.socket_port': 91})
 
-    game_config = os.path.join(os.getcwd(), 'whosonfirst', 'config.yaml')
+    game_config = os.path.join(os.getcwd(), 'config', 'whosonfirst.yaml')
 
     cherrypy.quickstart(Crystal_Maze(game_config), '/', conf)
