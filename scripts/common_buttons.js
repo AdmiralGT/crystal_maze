@@ -1,9 +1,12 @@
+var button_num_pad = 3
+
 // Get a Button Object from a HTTP Element ID
 function getButtonFromElementID(elementID)
 {
-    // Either the text or button was pressed, the last 9 characters is always
-    // the button's buttonID (button_XX).
-    var button_num_string = this.event.target.id.substr(this.event.target.id.length - 9);
+    // Either the text or button was pressed, the last 10 characters is always
+    // the button's buttonID (button_XXX).
+    var button_id_length = 7 + button_num_pad
+    var button_num_string = this.event.target.id.substr(this.event.target.id.length - button_id_length);
     for (var ii = 0; ii < global_button_list.length; ii++)
     {
     	var button = global_button_list[ii]
@@ -29,8 +32,8 @@ function generate_button_grid(button_list)
 	for (var button_num = 0; button_num < button_list.length; button_num++)
 	{
 		// Get the Button Object from our global list and generate a element name for this Button.
-		var button = global_button_list[button_num];
-		var button_id = "button_" + button_num.toString().padStart(2, "0");
+		var button = button_list[button_num];
+		var button_id = "button_" + button_num.toString().padStart(button_num_pad, "0");
 		button.setButtonID(button_id);
 
 		// Create a group attribute for the circle and text.
@@ -57,7 +60,14 @@ function generate_button_grid(button_list)
 			var text_id = "text_" + ii + "_for_" + button_id;
 			button.addTextID(text_id);
 			text_element.setAttributeNS(null, 'id', text_id);
-			text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+			if (button.bold)
+			{
+				text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+			}
+			else
+			{
+				text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + '; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+			}
 			text_element.setAttributeNS(null, 'text-anchor', 'middle');
 			text_element.setAttributeNS(null, 'onmousedown', 'button_press()');
 			var text_node = document.createTextNode(button.text[ii]);

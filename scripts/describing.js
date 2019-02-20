@@ -55,8 +55,9 @@ function generate_buttons(buttons)
 function display_button()
 {
 	// We can only display a certain number of buttons so slice the list at the max size
-	shuffle(global_button_list)
-	game_button_list = global_button_list.slice(0, 1)
+	// shuffle(global_button_list)
+	game_button_list = new Array()
+	game_button_list.push(global_button_list.pop())
 	generate_button_grid(game_button_list)
 	set_button_locations(game_button_list)
 }
@@ -109,7 +110,6 @@ function reset_game()
 	global_button_list.length = 0
 	global_button_locations.length = 0
 	game_button_list.length = 0	
-	send_message_to_server('reload_config')
 	get_game_config()
 }
 

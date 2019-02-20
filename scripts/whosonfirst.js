@@ -182,6 +182,7 @@ function start_game()
 	    game_button_list = global_button_list.slice(0, horizontal * vertical)
 		generate_button_grid(game_button_list)
 	    set_button_locations(game_button_list)
+	    shuffle(game_button_list)
 	    target_button_list = game_button_list.slice(0, rounds)
 	    set_next_target(target_button_list.pop())
 
@@ -200,7 +201,6 @@ function reset_game()
 		svg_area.firstChild.remove()
 	}
 	game_in_progress = false
-	send_message_to_server("reload_config")
 	global_button_list.length = 0
 	global_button_locations.length = 0
 	game_button_list.length = 0

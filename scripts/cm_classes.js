@@ -13,6 +13,7 @@ function Button(colour, text, text_colour, radius)
     this.target = false;
     this.imageurl = '';
     this.text_size = 26;
+    this.bold = false;
 
 	this.setLocation = function(buttonLocation)
 	{
@@ -47,6 +48,11 @@ function Button(colour, text, text_colour, radius)
     this.setImageURL = function(url)
     {
     	this.imageurl = url
+    }
+
+    this.setBold = function(isBold)
+    {
+    	this.bold = isBold
     }
 }
 

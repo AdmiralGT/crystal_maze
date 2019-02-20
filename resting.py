@@ -17,13 +17,14 @@ class Crystal_Maze(object):
 
     @cherrypy.expose
     def whosonfirst_buttons(self):
+        self.reload_config()
         return json.dumps(self.config)
 
     @cherrypy.expose
     def post_slack_message(self, imageurl='null'):
         attachment = {'image_url': imageurl, 'text': 'Test'}
         data = {'attachments': [attachment]}
-        # r = requests.post(self.config['slack_url'], json=data)
+        r = requests.post(self.config['slack_url'], json=data)
         return
 
     @cherrypy.expose
