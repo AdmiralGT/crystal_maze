@@ -90,6 +90,11 @@ function receive_game_config(config)
 	generate_buttons(json['buttons'])
 	rounds = json['rounds']
 	game_length = json['gamelength']
+  if (json['width'])
+    svg_width = json['width']
+  if (json['height'])
+    svg_height = json['height']
+  size_game_board("svg_area", svg_width, svg_height)
 }
 
 // Function that generates all our necessary buttons
@@ -176,7 +181,7 @@ function start_game()
 	{
 		score = 0;
 		game_in_progress = true;
-	
+
 	    // We can only display a certain number of buttons so slice the list at the max size
 	    shuffle(global_button_list)
 	    game_button_list = global_button_list.slice(0, horizontal * vertical)
