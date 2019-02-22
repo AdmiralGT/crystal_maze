@@ -27,7 +27,7 @@ function receive_game_config(config)
 {
 	var json = JSON.parse(config)
 	generate_buttons(json['buttons'])
-	display_button()	
+	display_button()
 }
 
 // Function that generates all our necessary buttons
@@ -109,7 +109,7 @@ function reset_game()
 	clear_display()
 	global_button_list.length = 0
 	global_button_locations.length = 0
-	game_button_list.length = 0	
+	game_button_list.length = 0
 	get_game_config()
 }
 
@@ -123,7 +123,7 @@ function button_press()
 // What to do when we press the enter button
 function enter_description()
 {
-	
+
 	display_new_button()
 	var description = $("#guess_textbox").val()
 	var button = game_button_list[0]
@@ -167,7 +167,7 @@ function send_message_to_server(url)
 }
 
 // Function to build a button and put it in the global list of buttons.
-function make_button(button_json)
+function generate_score_board()
 {
     //var button = new Button(colour, text, text_colour, button_radius);
     var button = new Button(button_json.colour, button_json.text, button_json.text_colour, button_radius)
@@ -175,3 +175,52 @@ function make_button(button_json)
     global_button_list.push(button)
 }
 
+  // Generate the general SVG area to put buttons in.
+  var switch_svg = document.getElementById("svg_area");
+
+  for (var button_num = 0; button_num < button_list.length; button_num++)
+  {
+    // Get the Button Object from our global list and generate a element name for this Button.
+    var button = button_list[button_num];
+    var button_id = "button_" + button_num.toString().padStart(button_num_pad, "0");
+    button.setButtonID(button_id);
+
+    // Create a group attribute for the circle and text.
+    var g = document.createElementNS(svgNS, "g");
+    switch_svg.appendChild(g);
+
+    // Create the button element with the properties from the Button.
+    var button_element = document.createElementNS(svgNS, "circle");
+
+    button_element.setAttributeNS(null, 'id', button.button_id);
+    button_element.setAttributeNS(null, 'r', button.radius - 1);
+    button_element.setAttributeNS(null, 'fill', button.colour);
+    button_element.setAttributeNS(null, 'stroke', stroke);
+    button_element.setAttributeNS(null, 'stroke-width', stroke_width);
+    button_element.setAttributeNS(null, 'onmousedown', 'button_press()');
+
+    // Put the Button element in the group.
+    g.appendChild(button_element);
+
+    button.text_id.length = 0
+    for (var ii = 0; ii < button.text.length; ii++)
+    {
+      var text_element = document.createElementNS(svgNS, "text");
+      var text_id = "text_" + ii + "_for_" + button_id;
+      button.addTextID(text_id);
+      text_element.setAttributeNS(null, 'id', text_id);
+      if (button.bold)
+      {
+        text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+      }
+      else
+      {
+        text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + '; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+      }
+      text_element.setAttributeNS(null, 'text-anchor', 'middle');
+      text_element.setAttributeNS(null, 'onmousedown', 'button_press()');
+      var text_node = document.createTextNode(button.text[ii]);
+      text_element.appendChild(text_node);
+      g.appendChild(text_element);
+    }
+  }

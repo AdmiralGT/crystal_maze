@@ -87,7 +87,6 @@ function set_next_target(button)
 function receive_game_config(config)
 {
 	var json = JSON.parse(config)
-	generate_buttons(json['buttons'])
 	rounds = json['rounds']
 	game_length = json['gamelength']
   if (json['width'])
@@ -95,6 +94,7 @@ function receive_game_config(config)
   if (json['height'])
     svg_height = json['height']
   size_game_board("svg_area", svg_width, svg_height)
+  generate_buttons(json['buttons'])
 }
 
 // Function that generates all our necessary buttons
@@ -136,7 +136,6 @@ function generate_button_location(id, width, height)
 // Used on page load to generate the light grid and buttons that will be in game
 function generate_game()
 {
-    size_game_board("svg_area", svg_width, svg_height);
     get_game_config();
     generate_objects();
 }
@@ -185,7 +184,7 @@ function start_game()
 	    // We can only display a certain number of buttons so slice the list at the max size
 	    shuffle(global_button_list)
 	    game_button_list = global_button_list.slice(0, horizontal * vertical)
-		generate_button_grid(game_button_list)
+		  generate_button_grid(game_button_list)
 	    set_button_locations(game_button_list)
 	    shuffle(game_button_list)
 	    target_button_list = game_button_list.slice(0, rounds)
@@ -244,3 +243,58 @@ function make_button(button_json)
     global_button_list.push(button)
 }
 
+function generate_score_board(score_list)
+{
+  // Generate the general SVG area to put buttons in.
+  var scoreboard_svg = document.getElementById("scoreboard_svg");
+
+  for (var score_num = 0; score_num < scores.length; score_num++)
+  {
+    var score = score_list[score_num];
+
+    var g = document.createElementNS(svgNS, "g");
+    switch_svg.appendChild(g);
+
+    var score_element = document.createElementNS(svgNS, "rect");
+
+    score_element.setAttributeNS(null, 'width', score.width)
+    score_element.setAttributeNS(null, 'height', score.height)
+  }
+
+  // Create the button element with the properties from the Button.
+
+  for (var button_num = 0; button_num < button_list.length; button_num++)
+  {
+    button_element.setAttributeNS(null, 'id', button.button_id);
+    button_element.setAttributeNS(null, 'r', button.radius - 1);
+    button_element.setAttributeNS(null, 'fill', button.colour);
+    button_element.setAttributeNS(null, 'stroke', stroke);
+    button_element.setAttributeNS(null, 'stroke-width', stroke_width);
+    button_element.setAttributeNS(null, 'onmousedown', 'button_press()');
+
+    // Put the Button element in the group.
+    g.appendChild(button_element);
+
+    button.text_id.length = 0
+    for (var ii = 0; ii < button.text.length; ii++)
+    {
+      var text_element = document.createElementNS(svgNS, "text");
+      var text_id = "text_" + ii + "_for_" + button_id;
+      button.addTextID(text_id);
+      text_element.setAttributeNS(null, 'id', text_id);
+      if (button.bold)
+      {
+        text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+      }
+      else
+      {
+        text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + '; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
+      }
+      text_element.setAttributeNS(null, 'text-anchor', 'middle');
+      text_element.setAttributeNS(null, 'onmousedown', 'button_press()');
+      var text_node = document.createTextNode(button.text[ii]);
+      text_element.appendChild(text_node);
+      g.appendChild(text_element);
+    }
+  }
+}

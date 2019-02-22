@@ -4,13 +4,14 @@ import requests
 import yaml
 import json
 
+
 class Crystal_Maze(object):
 
     def __init__(self, config_file):
         self.config_file = config_file
         self.load_config(self.config_file)
         return
-        
+
     @cherrypy.expose
     def answer(self):
         return '{"data": ' + str(3809) + '}'
@@ -24,7 +25,8 @@ class Crystal_Maze(object):
     def post_slack_message(self, imageurl='null'):
         attachment = {'image_url': imageurl, 'text': 'Test'}
         data = {'attachments': [attachment]}
-        r = requests.post(self.config['slack_url'], json=data)
+        if 'slack_url' in self.config:
+            requests.post(self.config['slack_url'], json=data)
         return
 
     @cherrypy.expose
@@ -39,12 +41,11 @@ class Crystal_Maze(object):
     @cherrypy.expose
     def describe_button(self, description="", button_colour="Unknown", text_colour="Unknown", button_text="Unknown"):
         with open('descriptions.txt', 'a+') as descriptions:
-            descriptions.write("Button Colour: " + button_colour + ", Text Colour: " + text_colour + "\n")
-            descriptions.write("Button Text:\n")
-            descriptions.write(button_text + "\n")
-            descriptions.write("Description: ")
-            descriptions.write(description)
-            descriptions.write('\n')
+            button_test = "Button Colour: " + button_colour + ", Text Colour: " + text_colour + "\n"
+            button_text = "Button Text:\n" + button_text + "\n"
+            description_text = "Description: " + description + "\n"
+            descriptions.write(button_test + button_text + description_text)
+
 
 if __name__ == '__main__':
     conf = \
@@ -56,7 +57,7 @@ if __name__ == '__main__':
         }
 
     cherrypy.config.update({'server.socket_host': '0.0.0.0'})
-    cherrypy.config.update({'server.socket_port': 91})
+    cherrypy.config.update({'server.socket_port': 8091})
 
     game_config = os.path.join(os.getcwd(), 'config', 'whosonfirst.yaml')
 
