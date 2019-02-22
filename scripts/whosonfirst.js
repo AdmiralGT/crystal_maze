@@ -5,6 +5,10 @@ var svgNS = "http://www.w3.org/2000/svg";
 var svg_width = 1200;
 var svg_height = 675
 
+var scoreboard_svg_inner = 56;
+var scoreboard_svg_border = 4;
+var scoreboard_svg_size = scoreboard_svg_inner + scoreboard_svg_border;
+
 // A list of all the buttons and all the locations
 var global_button_list = new Array();
 var global_button_locations = new Array();
@@ -15,13 +19,16 @@ var target_button_list = new Array();
 // A list of the buttons in this game
 var game_button_list = new Array();
 
+// A list of possible scores
+var scores_list = new Array();
+
 // Variables for the buttons that can be pressed
 var button_pressed = "white";
 var button_radius = 50;
 var button_diameter = 2 * button_radius;
 var button_separation = 2;
 var button_effective_diameter = button_diameter + button_separation;
-var score = 0;
+var score_pos = 0;
 var rounds = 0;
 var game_in_progress = false;
 
@@ -40,21 +47,35 @@ function button_press()
 
 	    if (clicked_button.target)
 	    {
-	    	score += 1
 	    	alert("Correct")
+	    	set_score_position(score_pos + 1)
+	    	if (score_pos == scores_list.length - 1)
+	    	{
+	    		end_game()
+	    		return
+	    	}
 	    }
 	    else
 	    {
 	    	alert("Wrong")
+	    	set_score_position(score_pos - 1)
 	    }
 
 	    // We don't know which button is the current target so just set them all not to be the target
-	    for (var ii = 0; ii < global_button_list.length; ii++)
+	    for (var ii = 0; ii < game_button_list.length; ii++)
 	    {
-	    	var button = global_button_list[ii]
+	    	var button = game_button_list[ii]
 	    	button.setTarget(false)
 	    }
 
+	    determine_next_action()
+	}
+}
+
+function determine_next_action()
+{
+    if (rounds > 0)
+    {
 	    if (target_button_list.length > 0)
 	    {
 		    set_next_target(target_button_list.pop())
@@ -63,7 +84,17 @@ function button_press()
 	    {
 	    	end_game()
 	    }
-	}
+    }
+    else
+    {
+    	if (target_button_list.length == 0)
+    	{
+		    shuffle(game_button_list)
+		    generate_target_list(rounds)
+    	}
+	    set_next_target(target_button_list.pop())
+    }
+
 }
 
 // Function to end the game and print the score
@@ -71,7 +102,7 @@ function end_game()
 {
 	clearTimeout(game_end_timer)
    	game_in_progress = false
-   	alert("Score: " + score)
+   	alert("Score: " + scores_list[score_pos])
    	reset_game()
 }
 
@@ -87,14 +118,22 @@ function set_next_target(button)
 function receive_game_config(config)
 {
 	var json = JSON.parse(config)
-	rounds = json['rounds']
-	game_length = json['gamelength']
-  if (json['width'])
-    svg_width = json['width']
-  if (json['height'])
-    svg_height = json['height']
-  size_game_board("svg_area", svg_width, svg_height)
-  generate_buttons(json['buttons'])
+	if (json['rounds'])
+		rounds = json['rounds']
+	if (json['gamelength'])
+		game_length = json['gamelength']
+  	if (json['width'])
+  		svg_width = json['width']
+  	if (json['height'])
+  	  	svg_height = json['height']
+  	size_game_board("svg_area", svg_width, svg_height)
+
+  	if (json['buttons'])
+  		generate_buttons(json['buttons'])
+ 	if (json['scores'])
+		scores_list = json['scores'] 		
+  		generate_score_board(scores_list)
+  		size_game_board("score_svg", scoreboard_svg_size * scores_list.length, scoreboard_svg_size)
 }
 
 // Function that generates all our necessary buttons
@@ -143,7 +182,7 @@ function generate_game()
 // Function to generate the guess box and guess button.
 function generate_objects()
 {
-    var gameboard = document.getElementById('gameboard');
+    var gameboard = document.getElementById('scoreboard');
     var div = document.createElement('div');
     div.setAttribute('id', 'guess_div');
 
@@ -158,6 +197,18 @@ function generate_objects()
     reset_button.setAttribute('onclick', 'reset_game()');
     reset_button.setAttribute('id', 'reset_button');
     div.appendChild(reset_button);
+
+    var add_button = document.createElement('button');
+    add_button.innerHTML = "Add";
+    add_button.setAttribute('onclick', 'add_score()');
+    add_button.setAttribute('id', 'add_button');
+    div.appendChild(add_button);
+
+    var subtract_button = document.createElement('button');
+    subtract_button.innerHTML = "Reset";
+    subtract_button.setAttribute('onclick', 'subtract_score()');
+    subtract_button.setAttribute('id', 'subtract_button');
+    div.appendChild(subtract_button);
 
     gameboard.appendChild(div);
 }
@@ -178,16 +229,16 @@ function start_game()
 {
 	if (!game_in_progress)
 	{
-		score = 0;
+		set_score_position(0)
 		game_in_progress = true;
 
 	    // We can only display a certain number of buttons so slice the list at the max size
 	    shuffle(global_button_list)
 	    game_button_list = global_button_list.slice(0, horizontal * vertical)
-		  generate_button_grid(game_button_list)
+	  	generate_button_grid(game_button_list)
 	    set_button_locations(game_button_list)
 	    shuffle(game_button_list)
-	    target_button_list = game_button_list.slice(0, rounds)
+	    generate_target_list(rounds)
 	    set_next_target(target_button_list.pop())
 
 	    if (game_length > 0)
@@ -197,12 +248,29 @@ function start_game()
 	}
 }
 
+function generate_target_list(num_rounds)
+{
+    if (rounds != 0)
+    {
+    	target_button_list = game_button_list.slice(0, rounds)
+    }
+	else
+	{
+		target_button_list = game_button_list.slice()
+	}
+}
+
 function reset_game()
 {
 	var svg_area = document.getElementById("svg_area")
 	while (svg_area.firstChild)
 	{
 		svg_area.firstChild.remove()
+	}
+	var scoreboard_svg = document.getElementById("score_svg")
+	while (scoreboard_svg.firstChild)
+	{
+		scoreboard_svg.firstChild.remove()
 	}
 	game_in_progress = false
 	global_button_list.length = 0
@@ -245,56 +313,78 @@ function make_button(button_json)
 
 function generate_score_board(score_list)
 {
-  // Generate the general SVG area to put buttons in.
-  var scoreboard_svg = document.getElementById("scoreboard_svg");
+	// Generate the general SVG area to put buttons in.
+	var scoreboard_svg = document.getElementById("score_svg");
 
-  for (var score_num = 0; score_num < scores.length; score_num++)
-  {
-    var score = score_list[score_num];
+	for (var score_num = 0; score_num < score_list.length; score_num++)
+	{
+		var score = score_list[score_num];
 
-    var g = document.createElementNS(svgNS, "g");
-    switch_svg.appendChild(g);
+		var g = document.createElementNS(svgNS, "g");
+		scoreboard_svg.appendChild(g);
 
-    var score_element = document.createElementNS(svgNS, "rect");
+		var score_element = document.createElementNS(svgNS, "rect");
+		var scores_length = Math.floor(Math.log10(score_list.length)) + 1
+		var score_id = "score_" + score_num.toString().padStart(scores_length, "0");
 
-    score_element.setAttributeNS(null, 'width', score.width)
-    score_element.setAttributeNS(null, 'height', score.height)
-  }
+		score_element.setAttributeNS(null, 'id', score_id);
+		score_element.setAttributeNS(null, 'width', scoreboard_svg_inner)
+		score_element.setAttributeNS(null, 'height', scoreboard_svg_inner)
+		score_element.setAttributeNS(null, 'x', scoreboard_svg_size * score_num + (scoreboard_svg_border / 2))
+		score_element.setAttributeNS(null, 'y', scoreboard_svg_border / 2)
+		score_element.setAttributeNS(null, 'style', 'fill:black;;stroke:black;stroke-width:8')
+		g.appendChild(score_element)
 
-  // Create the button element with the properties from the Button.
+		var text_element = document.createElementNS(svgNS, "text");
+		var text_id = "text_for_" + score_id;
+		text_element.setAttributeNS(null, 'id', text_id);
+		text_element.setAttributeNS(null, 'text-anchor', 'middle');
+		text_element.setAttributeNS(null, 'style', 'fill:white;font-weight: bold; font-size: 20px; dominant-baseline: middle');
+		text_element.setAttributeNS(null, 'x', scoreboard_svg_size * score_num + (scoreboard_svg_size / 2))
+		text_element.setAttributeNS(null, 'y', scoreboard_svg_size / 2)
 
-  for (var button_num = 0; button_num < button_list.length; button_num++)
-  {
-    button_element.setAttributeNS(null, 'id', button.button_id);
-    button_element.setAttributeNS(null, 'r', button.radius - 1);
-    button_element.setAttributeNS(null, 'fill', button.colour);
-    button_element.setAttributeNS(null, 'stroke', stroke);
-    button_element.setAttributeNS(null, 'stroke-width', stroke_width);
-    button_element.setAttributeNS(null, 'onmousedown', 'button_press()');
+		var text_node = document.createTextNode(score);
+		text_element.appendChild(text_node);
+		g.appendChild(text_element);
+	}
+}
 
-    // Put the Button element in the group.
-    g.appendChild(button_element);
+function set_score_position(position)
+{
+	if (position >= scores_list.length)
+		position = scores_list.length - 1
+	if (position < 0)
+		position = 0
 
-    button.text_id.length = 0
-    for (var ii = 0; ii < button.text.length; ii++)
-    {
-      var text_element = document.createElementNS(svgNS, "text");
-      var text_id = "text_" + ii + "_for_" + button_id;
-      button.addTextID(text_id);
-      text_element.setAttributeNS(null, 'id', text_id);
-      if (button.bold)
-      {
-        text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + ';font-weight: bold; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
-      }
-      else
-      {
-        text_element.setAttributeNS(null, 'style', 'fill: ' + button.text_colour + '; font-size: ' + button.text_size + 'px; dominant-baseline: middle');
-      }
-      text_element.setAttributeNS(null, 'text-anchor', 'middle');
-      text_element.setAttributeNS(null, 'onmousedown', 'button_press()');
-      var text_node = document.createTextNode(button.text[ii]);
-      text_element.appendChild(text_node);
-      g.appendChild(text_element);
-    }
-  }
+	score_pos = position
+	update_scoreboard(position, scores_list)
+}
+
+function update_scoreboard(position, score_list)
+{
+	var scoreboard_svg = document.getElementById("score_svg");
+
+	for (var score_num = 0; score_num < score_list.length; score_num++)
+	{
+		var scores_length = Math.floor(Math.log10(score_list.length)) + 1
+		var score_id = "score_" + score_num.toString().padStart(scores_length, "0");
+		var score_element = document.getElementById(score_id);
+
+		var score_style = 'fill:black'
+		if (position == score_num)
+			score_style = score_style + ';stroke:green;stroke-width:' + scoreboard_svg_border
+		else
+			score_style = score_style + ';stroke:black;stroke-width:' + scoreboard_svg_border
+		score_element.setAttributeNS(null, 'style', score_style)
+	}
+}
+
+function add_score()
+{
+	set_score_position(score_pos + 1)
+}
+
+function subtract_score()
+{
+	set_score_position(score_pos - 1)
 }
