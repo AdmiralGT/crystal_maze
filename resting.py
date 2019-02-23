@@ -7,19 +7,24 @@ import json
 
 class Crystal_Maze(object):
 
-    def __init__(self, config_file):
-        self.config_file = config_file
-        self.load_config(self.config_file)
+    def __init__(self, config_files):
+        self.config_files = config_files
+        self.config = {}
+        self.load_config(self.config_files)
         return
 
     @cherrypy.expose
     def answer(self):
-        return '{"data": ' + str(3809) + '}'
+        if 'lightsout' in self.config:
+            if 'answer' in self.config['lightsout']:
+                answer = self.config['lightsout']['answer']
+                return '{"data": ' + str(answer) + '}'
 
     @cherrypy.expose
     def whosonfirst_buttons(self):
         self.reload_config()
-        return json.dumps(self.config)
+        if 'whosonfirst' in self.config:
+            return json.dumps(self.config['whosonfirst'])
 
     @cherrypy.expose
     def post_slack_message(self, imageurl='null'):
@@ -31,12 +36,13 @@ class Crystal_Maze(object):
 
     @cherrypy.expose
     def reload_config(self):
-        self.load_config(self.config_file)
+        self.load_config(self.config_files)
         return
 
-    def load_config(self, config_file):
-        with open(config_file) as config:
-            self.config = yaml.safe_load(config)
+    def load_config(self, config_files):
+        for config_name, config_file in config_files.items():
+            with open(config_file) as config:
+                self.config[config_name] = yaml.safe_load(config)
 
     @cherrypy.expose
     def describe_button(self, description="", button_colour="Unknown", text_colour="Unknown", button_text="Unknown"):
@@ -59,6 +65,13 @@ if __name__ == '__main__':
     cherrypy.config.update({'server.socket_host': '0.0.0.0'})
     cherrypy.config.update({'server.socket_port': 8091})
 
-    game_config = os.path.join(os.getcwd(), 'config', 'whosonfirst.yaml')
+    who_config = os.path.join(os.getcwd(), 'config', 'whosonfirst.yaml')
+    lights_config = os.path.join(os.getcwd(), 'config', 'lightsout.yaml')
 
-    cherrypy.quickstart(Crystal_Maze(game_config), '/', conf)
+    configs = {}
+    if os.path.isfile(who_config):
+        configs['whosonfirst'] = who_config
+    if os.path.isfile(lights_config):
+        configs['lightsout'] = lights_config
+
+    cherrypy.quickstart(Crystal_Maze(configs), '/', conf)

@@ -299,6 +299,7 @@ function make_button(button_json)
     global_button_list.push(button)
 }
 
+// Generate the score board where we display what score the player has
 function generate_score_board(score_list)
 {
 	// Generate the general SVG area to put buttons in.
@@ -312,8 +313,7 @@ function generate_score_board(score_list)
 		scoreboard_svg.appendChild(g);
 
 		var score_element = document.createElementNS(svgNS, "rect");
-		var scores_length = Math.floor(Math.log10(score_list.length)) + 1
-		var score_id = "score_" + score_num.toString().padStart(scores_length, "0");
+		var score_id = generate_id_of_object("score_", score_num, score_list.length)
 
 		score_element.setAttributeNS(null, 'id', score_id);
 		score_element.setAttributeNS(null, 'width', scoreboard_svg_inner)
@@ -337,6 +337,7 @@ function generate_score_board(score_list)
 	}
 }
 
+// Function to update where we sit on the scoring scale
 function set_score_position(position)
 {
 	if (position >= scores_list.length)
@@ -348,14 +349,15 @@ function set_score_position(position)
 	update_scoreboard(position, scores_list)
 }
 
+// Function to update the scoreboard highlighting with the current position
 function update_scoreboard(position, score_list)
 {
 	var scoreboard_svg = document.getElementById("score_svg");
 
+	// We also need to make sure all the other scores are unlighted so just spin through the entire list
 	for (var score_num = 0; score_num < score_list.length; score_num++)
 	{
-		var scores_length = Math.floor(Math.log10(score_list.length)) + 1
-		var score_id = "score_" + score_num.toString().padStart(scores_length, "0");
+		var score_id = generate_id_of_object("score_", score_num, score_list.length)
 		var score_element = document.getElementById(score_id);
 
 		var score_style = 'fill:black'
@@ -365,4 +367,18 @@ function update_scoreboard(position, score_list)
 			score_style = score_style + ';stroke:black;stroke-width:' + scoreboard_svg_border
 		score_element.setAttributeNS(null, 'style', score_style)
 	}
+}
+
+// Generate the ID of an object
+function generate_id_of_object(name, num, length)
+{
+	var padding = get_padding_length(length)
+	return name + num.toString().padStart(padding, "0")
+}
+
+
+// Determining how much padding we need for a list of objects
+function get_padding_length(length)
+{
+	return Math.floor(Math.log10(length)) + 1
 }
