@@ -198,18 +198,6 @@ function generate_objects()
     reset_button.setAttribute('id', 'reset_button');
     div.appendChild(reset_button);
 
-    var add_button = document.createElement('button');
-    add_button.innerHTML = "Add";
-    add_button.setAttribute('onclick', 'add_score()');
-    add_button.setAttribute('id', 'add_button');
-    div.appendChild(add_button);
-
-    var subtract_button = document.createElement('button');
-    subtract_button.innerHTML = "Reset";
-    subtract_button.setAttribute('onclick', 'subtract_score()');
-    subtract_button.setAttribute('id', 'subtract_button');
-    div.appendChild(subtract_button);
-
     gameboard.appendChild(div);
 }
 
@@ -377,14 +365,4 @@ function update_scoreboard(position, score_list)
 			score_style = score_style + ';stroke:black;stroke-width:' + scoreboard_svg_border
 		score_element.setAttributeNS(null, 'style', score_style)
 	}
-}
-
-function add_score()
-{
-	set_score_position(score_pos + 1)
-}
-
-function subtract_score()
-{
-	set_score_position(score_pos - 1)
 }
