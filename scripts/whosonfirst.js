@@ -250,6 +250,7 @@ function generate_target_list(num_rounds)
 
 function reset_game()
 {
+	clearTimeout(game_end_timer)
 	var svg_area = document.getElementById("svg_area")
 	while (svg_area.firstChild)
 	{
