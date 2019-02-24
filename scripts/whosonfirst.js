@@ -100,10 +100,9 @@ function determine_next_action()
 // Function to end the game and print the score
 function end_game()
 {
-	clearTimeout(game_end_timer)
    	game_in_progress = false
-   	alert("Score: " + scores_list[score_pos])
    	reset_game()
+   	alert("Score: " + scores_list[score_pos])
 }
 
 

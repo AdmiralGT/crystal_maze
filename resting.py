@@ -28,10 +28,11 @@ class Crystal_Maze(object):
 
     @cherrypy.expose
     def post_slack_message(self, imageurl='null'):
-        attachment = {'image_url': imageurl, 'text': 'Test'}
-        data = {'attachments': [attachment]}
-        if 'slack_url' in self.config:
-            requests.post(self.config['slack_url'], json=data)
+        if 'whosonfirst' in self.config:
+            if 'slack_url' in self.config['whosonfirst']:
+                attachment = {'image_url': imageurl, 'text': 'Test'}
+                data = {'attachments': [attachment]}
+                requests.post(self.config['whosonfirst']['slack_url'], json=data)
         return
 
     @cherrypy.expose
