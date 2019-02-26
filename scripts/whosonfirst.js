@@ -101,6 +101,7 @@ function determine_next_action()
 function end_game()
 {
    	game_in_progress = false
+   	send_message_to_server("post_score?score_pos=" + score_pos);
    	reset_game()
    	alert("Score: " + scores_list[score_pos])
 }
@@ -110,7 +111,7 @@ function end_game()
 function set_next_target(button)
 {
     button.setTarget(true)
-    send_message_to_server("post_slack_message?imageurl=" + button.imageurl);
+    send_message_to_server("post_whosonfirst_button?imageurl=" + button.imageurl);
 }
 
 // Function that receives game configuration
@@ -130,9 +131,18 @@ function receive_game_config(config)
   	if (json['buttons'])
   		generate_buttons(json['buttons'])
  	if (json['scores'])
-		scores_list = json['scores'] 		
+ 	{
+ 		var scores_dict = json['scores']
+ 		scores_list = []
+ 		for (var ii = 0; ii < scores_dict.length; ii++)
+ 		{
+ 			if (!isNaN(scores_dict[ii]['score']))
+ 				scores_list.push(scores_dict[ii]['score'])	
+ 		}
+		 		
   		generate_score_board(scores_list)
   		size_game_board("score_svg", scoreboard_svg_size * scores_list.length, scoreboard_svg_size)
+  	}
 }
 
 // Function that generates all our necessary buttons
@@ -204,7 +214,7 @@ function generate_objects()
 function get_game_config()
 {
 	var button_request = new XMLHttpRequest();
-	button_request.open('GET', 'whosonfirst_buttons', true);
+	button_request.open('GET', 'whosonfirst_config', true);
 	button_request.onload = function (e) {
 		receive_game_config(button_request.responseText)
 	}

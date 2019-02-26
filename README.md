@@ -21,13 +21,15 @@ player.
 In order to play Who's on First, a config file named 'whosonfirst.yaml' must be provided in the config directory. This must container the following config
 
 1. `slack_url` - The slack webhook URL to send the picture of the button to press.
-1. `scores` - A list of numbers which act as a scoreboard. Must be provided in ascending order.
+1. `scores` - A list of dictionaries which act as a scoreboard. Must be provided in ascending order. Each entry may contain
+	1. `score` - Mandatory, the score for this position
+	1. `urls` - Optional, a list of urls for the picture of the score (recommended that this looks like a button)
 1. `buttons` - A list of buttons to display to the user. Each button can have the following config
-2. `colour` - The colour of the button
-2. `text_colour` - The colour of the text that appears on the button
-2. `url` - A URL that is a picture of the button
-2. `text` - A list of text to display on the button. Each list item is on a new line
-2. `text_size` - An optional value, the text size in pixels to draw the text, default is 16.
+	1. `colour` - The colour of the button
+	1. `text_colour` - The colour of the text that appears on the button
+	1. `url` - A URL that is a picture of the button
+	1. `text` - A list of text to display on the button. Each list item is on a new line
+	1. `text_size` - An optional value, the text size in pixels to draw the text, default is 16.
 
 Additionally, the following configuration options can be provided
 
@@ -45,13 +47,22 @@ gamelength: 60
 height: 720
 width: 1200
 scores:
-  - 0
-  - 1
-  - 2
-  - 3
-  - 5
-  - 7
-  - 10
+  - score: 0
+    urls: 
+      - https://i.imgur.com/7SsPgdc.png
+      - https://i.imgur.com/gxrWdVV.png
+  - score : 1
+    urls:
+      - https://i.imgur.com/7SsPgdc.png
+      - https://i.imgur.com/gxrWdVV.png
+  - score : 2
+    urls:
+      - https://i.imgur.com/7SsPgdc.png
+      - https://i.imgur.com/gxrWdVV.png
+  - score : 3
+    urls:
+      - https://i.imgur.com/7SsPgdc.png
+      - https://i.imgur.com/gxrWdVV.png
 buttons:
   - colour: black
     text_colour: white
