@@ -61,8 +61,8 @@ class Crystal_Maze(object):
 
     @cherrypy.expose
     def record_stats(self, time=0, correct=False):
-        with open('stats.txt', 'a') as stats:
-            state.write()
+        with open('stats.txt', 'a+') as stats:
+            stats.write('Time:' + time + ';Correct:' + correct + '\n')
 
     # Reload our configuration
     @cherrypy.expose
