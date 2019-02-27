@@ -4,6 +4,7 @@ import requests
 import yaml
 import json
 import random
+import time
 
 
 class Crystal_Maze(object):
@@ -35,7 +36,10 @@ class Crystal_Maze(object):
         if 'whosonfirst' in self.config:
             if 'slack_url' in self.config['whosonfirst']:
                 data = {}
-                attachment = {'image_url': imageurl, 'text': text, 'color': color}
+                if 'slack_icon' in self.config['whosonfirst']:
+                    data['icon_url'] = self.config['whosonfirst']['slack_icon']
+                data['username'] = 'FirstBot'
+                attachment = {'image_url': imageurl, 'text': text, 'color': color, 'ts': time.time()}
                 data['attachments'] = [attachment]
                 requests.post(self.config['whosonfirst']['slack_url'], json=data)
         return
@@ -54,6 +58,11 @@ class Crystal_Maze(object):
                     data = {}
                     data['text'] = 'Game Over: Score: ' + score['score']
                     requests.post(self.config['whosonfirst']['slack_url'], json=data)
+
+    @cherrypy.expose
+    def record_stats(self, time=0, correct=False):
+        with open('stats.txt', 'a') as stats:
+            state.write()
 
     # Reload our configuration
     @cherrypy.expose

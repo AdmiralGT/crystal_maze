@@ -36,6 +36,8 @@ var game_in_progress = false;
 var game_end_timer;
 var game_length = -1;
 
+var image_shown = 0; 
+
 // Function called when a button is pressed
 // If this is a reset button, reset the light board, otherwise turn off the segment of lights.
 function button_press()
@@ -44,16 +46,12 @@ function button_press()
 	if (game_in_progress)
 	{
 	    var clicked_button = getButtonFromElementID(this.event.target.id);
-
+	    var correct = false;
 	    if (clicked_button.target)
 	    {
 	    	alert("Correct")
+	    	correct = true;
 	    	set_score_position(score_pos + 1)
-	    	if (score_pos == scores_list.length - 1)
-	    	{
-	    		end_game()
-	    		return
-	    	}
 	    }
 	    else
 	    {
@@ -61,6 +59,13 @@ function button_press()
 	    	set_score_position(score_pos - 1)
 	    }
 
+	    var time = new Date().getTime() - image_show
+	    send_message_to_server("record_stats?time=" + time + "&correct=" + correct)
+    	if (score_pos == scores_list.length - 1)
+    	{
+    		end_game()
+    		return
+    	}
 	    // We don't know which button is the current target so just set them all not to be the target
 	    for (var ii = 0; ii < game_button_list.length; ii++)
 	    {
@@ -112,6 +117,8 @@ function set_next_target(button)
 {
     button.setTarget(true)
     send_message_to_server("post_whosonfirst_button?imageurl=" + button.imageurl);
+    image_show = new Date().getTime();
+
 }
 
 // Function that receives game configuration
@@ -195,19 +202,17 @@ function generate_objects()
     var div = document.createElement('div');
     div.setAttribute('id', 'guess_div');
 
+    add_start_button(div)
+    gameboard.appendChild(div);
+}
+
+function add_start_button(div)
+{
     var start_button = document.createElement('button');
     start_button.innerHTML = "Start";
     start_button.setAttribute('onclick', 'start_game()');
     start_button.setAttribute('id', 'start_button');
     div.appendChild(start_button);
-
-    var reset_button = document.createElement('button');
-    reset_button.innerHTML = "Reset";
-    reset_button.setAttribute('onclick', 'reset_game()');
-    reset_button.setAttribute('id', 'reset_button');
-    div.appendChild(reset_button);
-
-    gameboard.appendChild(div);
 }
 
 // Get game configuration
@@ -226,6 +231,9 @@ function start_game()
 {
 	if (!game_in_progress)
 	{
+		var start_button = document.getElementById("start_button")
+		start_button.parentNode.removeChild(start_button);
+
 		set_score_position(0)
 		game_in_progress = true;
 
@@ -260,6 +268,8 @@ function generate_target_list(num_rounds)
 function reset_game()
 {
 	clearTimeout(game_end_timer)
+    var div = document.getElementById('guess_div');
+	add_start_button(div)
 	var svg_area = document.getElementById("svg_area")
 	while (svg_area.firstChild)
 	{
