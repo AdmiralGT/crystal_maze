@@ -5,6 +5,12 @@
   <script src="scripts/json2.js"> </script> <!-- this to make IE work -->
   <script src="scripts/jquery-1.10.2.min.js"> </script>
   <script src="scripts/jsrender.js"> </script>
+  <script src="scripts/cm_classes.js"> </script>
+  <script src="scripts/common.js"> </script>
+  <script src="scripts/common_buttons.js"> </script>
+  <script src="scripts/utilities.js"> </script>
+  <script src="scripts/lightsout.js"> </script>
+  <script src="scripts/old.js"> </script>
   <link rel="stylesheet" href="css/crystal_maze.css" />
 
   <link href='http://fonts.googleapis.com/css?family=Port+Lligat+Slab' rel='stylesheet' type='text/css'>
@@ -14,10 +20,15 @@
 
 <div class="navbar">
   <ul>
-    <li><a class="active" href="index.html">Home</a></li>
-    <li><a href="lightsout.html">Lights Out!</a></li>
+    <li><a href="index.html">Home</a></li>
+    <li><a class="active" href="lightsout.html">Lights Out!</a></li>
     <li><a href="whosonfirst.html">Whos on first</a></li>
   </ul>
+</div>
+
+<body onload="generate_game()">
+<div id="gameboard">
+  <svg id="svg_area"></svg>
 </div>
 
 </body>
