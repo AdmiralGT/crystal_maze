@@ -34,6 +34,7 @@ In order to play Who's on First, a config file named 'whosonfirst.yaml' must be 
 Additionally, the following configuration options can be provided
 
 1. `slack_icon` - The icon to display on the slack message. If no slack_icon is provided the default slack icon for the webhook is used.
+1. `stats` - The file to write stats to (how long a guess took and whether it was correct or not). If not provided, stats are not recorded.
 1. `rounds` - The number of buttons to have guesses for before the game ends. If no rounds config is provided, the game will continue until the max score is reached.
 1. `gamelength` - The length of time in seconds before the game ends. If no gamelength config is provided, the game will continue until the max score is reached.
 1. `height` - The height of the gameboard to display buttons in. Default is 675 pixels.

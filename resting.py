@@ -33,42 +33,47 @@ class Crystal_Maze(object):
     # Post a slack message with the image of the next button to press
     @cherrypy.expose
     def post_whosonfirst_button(self, imageurl='null', color='good', text='Describe'):
-        if 'whosonfirst' in self.config:
-            if 'slack_url' in self.config['whosonfirst']:
-                data = {}
-                if 'slack_icon' in self.config['whosonfirst']:
-                    data['icon_url'] = self.config['whosonfirst']['slack_icon']
-                data['username'] = 'FirstBot'
-                attachment = {'image_url': imageurl, 'text': text, 'color': color, 'ts': time.time()}
-                data['attachments'] = [attachment]
-                requests.post(self.config['whosonfirst']['slack_url'], json=data)
+        if self.whosonfirst_config_available('slack_url'):
+            data = {}
+            if 'slack_icon' in self.config['whosonfirst']:
+                data['icon_url'] = self.config['whosonfirst']['slack_icon']
+            data['username'] = 'FirstBot'
+            attachment = {'image_url': imageurl, 'text': text, 'color': color, 'ts': time.time()}
+            data['attachments'] = [attachment]
+            requests.post(self.config['whosonfirst']['slack_url'], json=data)
         return
 
     # Post a slack message with the image of the score
     @cherrypy.expose
     def post_score(self, score_pos=0):
-        if 'whosonfirst' in self.config:
-            if 'scores' in self.config['whosonfirst']:
-                score = self.config['whosonfirst']['scores'][int(score_pos)]
-                print(score)
-                if 'urls' in score:
-                    image_url = random.choice(score['urls'])
-                    self.post_whosonfirst_button(imageurl=image_url,color='warning',text="Score")
-                else:
-                    data = {}
-                    data['text'] = 'Game Over: Score: ' + score['score']
-                    requests.post(self.config['whosonfirst']['slack_url'], json=data)
+        if self.whosonfirst_config_available('scores'):
+            score = self.config['whosonfirst']['scores'][int(score_pos)]
+            if 'urls' in score:
+                image_url = random.choice(score['urls'])
+                self.post_whosonfirst_button(imageurl=image_url,color='warning',text="Score")
+            else:
+                data = {}
+                data['text'] = 'Game Over: Score: ' + score['score']
+                requests.post(self.config['whosonfirst']['slack_url'], json=data)
 
     @cherrypy.expose
     def record_stats(self, time=0, correct=False):
-        with open('stats.txt', 'a+') as stats:
-            stats.write('Time:' + time + ';Correct:' + correct + '\n')
+        if self.whosonfirst_config_available('stats'):
+            with open(self.config['whosonfirst']['stats'], 'a+') as stats:
+                stats.write('Time:' + time + ';Correct:' + correct + '\n')
 
     # Reload our configuration
     @cherrypy.expose
     def reload_config(self):
         self.load_config(self.config_files)
         return
+
+    # Determines if a given parameter is available in the whosonfirstconfig
+    def whosonfirst_config_available(self, parameter):
+        if 'whosonfirst' in self.config:
+            if parameter in self.config['whosonfirst']:
+                return True
+        return False
 
     # Load our config
     def load_config(self, config_files):
