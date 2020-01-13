@@ -3,6 +3,9 @@ var interval
 var blocks = []
 var keydowns = 0
 
+var svg_width = 1200
+var svg_height = 675
+
 class Block 
 {
 	constructor(id, x, y, speed, target, key) {
@@ -43,16 +46,37 @@ class Block
 
 	placeBlock()
 	{
-		var bar = document.getElementById(this.block_id)
-		bar.setAttribute("x", this.x.toString())
+		placeObject(this.block_id, this.x)
 	}
+}
+
+class Target
+{
+	constructor(id, x, y)
+	{
+		this.target_id = id
+		this.x = x
+		this.y = y
+		this.placeTarget()
+	}
+
+	placeTarget()
+	{
+		placeObject(this.target_id, this.x)
+	}
+
+}
+
+function placeObject(id, x)
+{
+	var object = document.getElementById(id)
+	object.setAttribute("x", x.toString())
 }
 
 function generate_game()
 {
-    size_game_board("svg_area", 1200, 675)
-    initializeBlocks()
-    //initializeTargets()
+    size_game_board("svg_area", svg_width, svg_height)
+    initializeGame()
 
     interval = setInterval(loop, 1)
 
@@ -64,9 +88,20 @@ function loop()
 	blocks.forEach(block => block.moveBlock())
 }
 
+function initializeGame()
+{
+	initializeBlocks()
+	initializeTargets()
+}
+
 function initializeBlocks()
 {
 	blocks.push(new Block("blue", 5, 2, 2, null, 90))
+}
+
+function initializeTargets()
+{
+	return
 }
 
 function stopBlocks(keyID)
@@ -82,10 +117,10 @@ function resetBlocks()
 $(document).keydown(function (e) {
 	// Prevent the default behaviour so we don't lose focus
 	keyID = e.which
-	//if ((keyID >= 48) || (keyID <= 90))
-	//{
+	if ((keyID == 32) || ((keyID >= 48) && (keyID <= 90)))
+	{
 		e.preventDefault();
-		if (e.ctrlKey)
+		if (keyID == 32)
 		{
 			resetBlocks()
 		}
@@ -93,5 +128,5 @@ $(document).keydown(function (e) {
 		{
 			stopBlocks(keyID)
 		}
-	//}
+	}
 });
