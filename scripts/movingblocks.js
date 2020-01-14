@@ -14,7 +14,7 @@ class Block
 		this.y = y
 		this.length = length
 		this.speed = speed
-		this.target_id = target
+		this.target_object = target
 		this.key = key
 		this.active = true
 		this.updateRight()
@@ -53,7 +53,7 @@ class Block
 
 	flipBlock()
 	{
-		if ((this.x > 600) || (this.x < 1))
+		if ((this.right > 1160) || (this.x < 40))
 		{
 			this.speed = this.speed * -1
 		}
@@ -66,7 +66,7 @@ class Block
 
 	inTarget()
 	{
-		if ((this.x > this.target.left) && (this.x < this.target.right))
+		if ((this.x > this.target_object.left) && (this.x < this.target_object.right))
 		{
 			return true
 		}
@@ -84,12 +84,18 @@ class Target
 		this.length = length
 		this.left = this.x + 2
 		this.right = this.x + length - 4
+		this.sizeTarget()
 		this.placeTarget()
 	}
 
 	placeTarget()
 	{
 		placeObject(this.target_id, this.x)
+	}
+
+	sizeTarget()
+	{
+		sizeObject(this.target_id, this.length)
 	}
 
 }
@@ -111,7 +117,7 @@ function generate_game()
     size_game_board("svg_area", svg_width, svg_height)
     initializeGame()
 
-    interval = setInterval(loop, 1)
+    interval = setInterval(loop, 2)
 
 }
 
@@ -130,14 +136,22 @@ function initializeGame()
 function initializeBlocks()
 {
 	// x, y, length, speed, target, key
-	blocks.push(new Block("blue", 5, 2, 80, 2, null, 58))
-	blocks.push(new Block("red", 5, 2, 80, 2, null, 49))
-	blocks.push(new Block("yellow", 5, 2, 80, 2, null, 52))
-	blocks.push(new Block("limegreen", 5, 2, 80, 2, null, 74))
-	blocks.push(new Block("cyan", 5, 2, 80, 2, null, 84))
-	blocks.push(new Block("darkorange", 5, 2, 80, 2, null, 60))
-	blocks.push(new Block("purple", 5, 2, 80, 2, null, 87))
-	blocks.push(new Block("hotpink", 5, 2, 80, 2, null, 80))
+	var blue = new Target("blue_target", 471, 2, 143)
+	blocks.push(new Block("blue", 473, 2, 80, 2, blue, 76))
+	var red = new Target("red_target", 426, 2, 113)
+	blocks.push(new Block("red", 428, 2, 80, 1, red, 49))
+	var gold = new Target("gold_target", 996, 2, 134)
+	blocks.push(new Block("gold", 998, 2, 80, 3, gold, 52))
+	var limegreen = new Target("limegreen_target", 843, 2, 123)
+	blocks.push(new Block("limegreen", 847, 2, 80, 3, limegreen, 74))
+	var cyan = new Target("cyan_target", 314, 2, 117)
+	blocks.push(new Block("cyan", 316, 2, 80, 2.5, cyan, 84))
+	var darkorange = new Target("darkorange_target", 189, 2, 153)
+	blocks.push(new Block("darkorange", 193, 2, 80, 2.5, darkorange, 86))
+	//var purple = new Target("purple_target", 1022, 2, 156)
+	//blocks.push(new Block("purple", 1024, 2, 80, 3, purple, 87))
+	//var hotpink = new Target("hotpink_target", 132, 2, 119)
+	//blocks.push(new Block("hotpink", 134, 2, 80, 2, hotpink, 80))
 }
 
 function initializeTargets()
@@ -176,10 +190,28 @@ function resetBlocks()
 	blocks.forEach(block => block.active = true)
 }
 
+function isValidKeyCode(keyID)
+{
+	if (keyID == 32)
+	{
+		return true
+	}
+	if ((keyID < 48) || (keyID > 90))
+	{
+		return false
+	}
+	if ((keyID > 57) && (keyID < 65))
+	{
+		return false
+	}
+	return true
+}
+
 $(document).keydown(function (e) {
 	// Prevent the default behaviour so we don't lose focus
 	keyID = e.which
-	if ((keyID == 32) || ((keyID >= 48) && (keyID <= 90)))
+
+	if (isValidKeyCode(keyID))
 	{
 		e.preventDefault();
 		if (keyID == 32)
