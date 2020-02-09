@@ -1,19 +1,22 @@
 // Used on page load to generate the light grid and buttons that will be in game
 var interval
 var blocks = []
-var keydowns = 0
+var keyIDs = []
 
 var svg_width = 1200
 var svg_height = 675
 
+var MIN_KEY = 65 // a
+var MAX_KEY = 90 // z
+var SPACE_BAR = 32
+
 class Block 
 {
-	constructor(id, x, y, length, speed, target, key) {
+	constructor(id, target, key) {
 		this.block_id = id
-		this.x = x
-		this.y = y
-		this.length = length
-		this.speed = speed
+		this.x = getRandomInt(100, 1000)
+		this.length = 80
+		this.speed = Math.random() + 1
 		this.target_object = target
 		this.key = key
 		this.active = true
@@ -32,6 +35,10 @@ class Block
 		if (keyID == this.key)
 		{
 			this.active = false
+			if (this.inTarget())
+			{
+				this.target_object.colourTarget()
+			}
 		}
 	}
 
@@ -66,24 +73,30 @@ class Block
 
 	inTarget()
 	{
-		if ((this.x > this.target_object.left) && (this.x < this.target_object.right))
+		if ((this.x > this.target_object.left) && ((this.x + this.length) < this.target_object.right))
 		{
 			return true
 		}
 		return false
 	}
+
+	reset()
+	{
+		this.active = true
+		this.target_object.resetTarget()
+	}
 }
 
 class Target
 {
-	constructor(id, x, y, length)
+	constructor(colour)
 	{
-		this.target_id = id
-		this.x = x
-		this.y = y
-		this.length = length
+		this.target_id = colour + "_target"
+		this.length = getRandomInt(120, 160)
+		this.x = getRandomInt(100, 1100 - this.length)
 		this.left = this.x + 2
-		this.right = this.x + length - 4
+		this.right = this.x + this.length - 4
+		this.colour = colour
 		this.sizeTarget()
 		this.placeTarget()
 	}
@@ -98,6 +111,16 @@ class Target
 		sizeObject(this.target_id, this.length)
 	}
 
+	colourTarget()
+	{
+		colourObject(this.target_id, this.colour)
+	}
+
+	resetTarget()
+	{
+		colourObject(this.target_id, "white")
+	}
+
 }
 
 function placeObject(id, x)
@@ -110,6 +133,12 @@ function sizeObject(id, width)
 {
 	var object = document.getElementById(id)
 	object.setAttribute("width", width.toString())
+}
+
+function colourObject(id, colour)
+{
+	var object = document.getElementById(id)
+	object.style.fill = colour
 }
 
 function generate_game()
@@ -129,29 +158,35 @@ function loop()
 
 function initializeGame()
 {
+	for (var ii = MIN_KEY; ii <= MAX_KEY; ii++)
+	{
+		keyIDs.push(ii)
+	}
+	shuffle(keyIDs)
 	initializeBlocks()
 	initializeTargets()
 }
 
 function initializeBlocks()
 {
-	// x, y, length, speed, target, key
-	var blue = new Target("blue_target", 471, 2, 143)
-	blocks.push(new Block("blue", 473, 2, 80, 2, blue, 76))
-	var red = new Target("red_target", 426, 2, 113)
-	blocks.push(new Block("red", 428, 2, 80, 1, red, 49))
-	var gold = new Target("gold_target", 996, 2, 134)
-	blocks.push(new Block("gold", 998, 2, 80, 3, gold, 52))
-	var limegreen = new Target("limegreen_target", 843, 2, 123)
-	blocks.push(new Block("limegreen", 847, 2, 80, 2.25, limegreen, 74))
-	var cyan = new Target("cyan_target", 314, 2, 117)
-	blocks.push(new Block("cyan", 316, 2, 80, 3, cyan, 84))
-	var darkorange = new Target("darkorange_target", 189, 2, 153)
-	blocks.push(new Block("darkorange", 193, 2, 80, 2.75, darkorange, 86))
-	//var purple = new Target("purple_target", 1022, 2, 156)
-	//blocks.push(new Block("purple", 1024, 2, 80, 3, purple, 87))
-	//var hotpink = new Target("hotpink_target", 132, 2, 119)
-	//blocks.push(new Block("hotpink", 134, 2, 80, 2, hotpink, 80))
+	var blue = new Target("blue")
+	var red = new Target("red")
+	var gold = new Target("gold")
+	var limegreen = new Target("limegreen")
+	var cyan = new Target("cyan")
+	var darkorange = new Target("darkorange")
+	//var purple = new Target("purple")
+	//var hotpink = new Target("hotpink")
+
+	// x, y, length, target, key
+	blocks.push(new Block("blue", blue, keyIDs.pop()))
+	blocks.push(new Block("red", red, keyIDs.pop()))
+	blocks.push(new Block("gold", gold, keyIDs.pop()))
+	blocks.push(new Block("limegreen", limegreen, keyIDs.pop()))
+	blocks.push(new Block("cyan", cyan, keyIDs.pop()))
+	blocks.push(new Block("darkorange", darkorange, keyIDs.pop()))
+	//blocks.push(new Block("purple", 1024, 2, 80, purple, keyIDs.pop()))
+	//blocks.push(new Block("hotpink", 134, 2, 80, hotpink, keyIDs.pop()))
 }
 
 function initializeTargets()
@@ -187,23 +222,26 @@ function stopBlocks(keyID)
 
 function resetBlocks()
 {
-	blocks.forEach(block => block.active = true)
+	blocks.forEach(block => block.reset())
 }
 
 function isValidKeyCode(keyID)
 {
-	if (keyID == 32)
+	if (keyID == SPACE_BAR)
 	{
+		// Space bar
 		return true
 	}
-	if ((keyID < 48) || (keyID > 90))
+	if ((keyID < MIN_KEY) || (keyID > MAX_KEY))
 	{
+		// a - z
 		return false
 	}
-	if ((keyID > 57) && (keyID < 65))
-	{
-		return false
-	}
+	// 0 is key 48, 9 is 57, there are no keycodes between 9 (57) and a (65)
+	//if ((keyID > 57) && (keyID < 65))
+	//{
+	//	return false
+	//}
 	return true
 }
 
@@ -214,7 +252,7 @@ $(document).keydown(function (e) {
 	if (isValidKeyCode(keyID))
 	{
 		e.preventDefault();
-		if (keyID == 32)
+		if (keyID == SPACE_BAR)
 		{
 			resetBlocks()
 		}
