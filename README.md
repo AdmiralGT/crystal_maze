@@ -77,3 +77,9 @@ buttons:
     text: one
 
 ```
+
+## Moving Blocks
+
+In this game, a set of 6 blocks will move left and right across the screen. Each can be stopped using one of the keys between a-z (which are randomised on each play). Pressing space bar will restart *all* blocks.
+
+The player must stop all blocks in the target area. 
